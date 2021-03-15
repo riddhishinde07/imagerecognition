@@ -24,7 +24,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".changepass"></activity>
+        <activity android:name=".password"></activity>
         <activity android:name=".Profile" />
         <activity android:name=".reset" />
         <activity android:name=".Register" />

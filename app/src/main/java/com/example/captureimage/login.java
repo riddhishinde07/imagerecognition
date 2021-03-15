@@ -39,7 +39,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.protobuf.Api;
 
 
-public class login extends AppCompatActivity  {
+public class login extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener  {
     FirebaseAuth mAuth;
     GoogleSignInClient mGoogleSignInClient;
     //code you will assign for starting the new activity.
@@ -98,6 +98,7 @@ public class login extends AppCompatActivity  {
             public void onClick(View v) {
                 Intent signInIntent = mGoogleSignInClient.getSignInIntent();
                 startActivityForResult(signInIntent, RC_SIGN_IN);
+
 
             }
         });
@@ -185,6 +186,8 @@ public class login extends AppCompatActivity  {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Toast.makeText(getApplicationContext(), "Logged in Successfully", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(getApplicationContext(), MainActivity.class));
+
+
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -199,7 +202,7 @@ public class login extends AppCompatActivity  {
 
         }
     }
-  /* public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+  public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.image) {
             Intent intent = new Intent(login.this,MainActivity.class);
@@ -212,20 +215,11 @@ public class login extends AppCompatActivity  {
             startActivity(intent);
         }
         if (id == R.id.changepassword) {
-            googleSignInAccount = GoogleSignIn.getLastSignedInAccount(login.this);
-            if (googleSignInAccount != null) {
-
-                PackageManager pm = getPackageManager();
-                pm.setComponentEnabledSetting(new ComponentName(this, changepass.class),
-                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED, 0);
-                Toast.makeText(getApplicationContext(), "Change Password Cant be used to google login", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
-            } else {
-                Intent intent = new Intent(login.this, changepass.class);
+                Intent intent = new Intent(login.this, password.class);
                 Toast.makeText(this, "Change Password", Toast.LENGTH_SHORT).show();
                 startActivity(intent);
             }
-        }
+
         return false;
-    }*/
+    }
 }

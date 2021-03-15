@@ -210,47 +210,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    /*public void ClickImage(View view) {
-        //recreate activity
-        recreate();
 
-    }
-
-    public void ChangePassword(View view) {
-        //recreate activity
-        redirectActivity(this, changepass.class);
-
-    }
-
-    public void Profile(View view) {
-        //recreate activity
-        redirectActivity(this, Profile.class);
-    }
-
-
-    public static void redirectActivity(Activity activity, Class aClass) {
-        //initialized intent
-        Intent intent = new Intent(activity, aClass);
-        //set flag
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        //start activity
-        activity.startActivity(intent);
-
-    }
-
-    public void ClickLogout(View view) {
-        //recreate activity
-        logout();
-    }
-
-
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        //close drawer
-        closeDrawer(drawerLayout);
-    }*/
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -266,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(intent);
         }
         if (id == R.id.changepassword) {
-            Intent intent = new Intent(MainActivity.this,changepass.class);
+            Intent intent = new Intent(MainActivity.this,password.class);
             Toast.makeText(this, "Change Password", Toast.LENGTH_SHORT).show();
             startActivity(intent);
         }
