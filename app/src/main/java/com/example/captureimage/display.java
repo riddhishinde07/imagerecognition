@@ -254,7 +254,7 @@ public class display extends AppCompatActivity implements NavigationView.OnNavig
         }
         if (id == R.id.changepassword) {
             Toast.makeText(this, "Change Password", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(display.this,change.class);
+            Intent intent = new Intent(display.this,changepass.class);
             startActivity(intent);
         }
         return false;

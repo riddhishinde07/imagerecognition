@@ -184,11 +184,6 @@ public class login extends AppCompatActivity  {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Toast.makeText(getApplicationContext(), "Logged in Successfully", Toast.LENGTH_SHORT).show();
-                       // startActivity(new Intent(getApplicationContext(),MainActivity.class));
-                  //      PackageManager pm = getPackageManager();
-                    //    pm.setComponentEnabledSetting(new ComponentName(login.this, change.class),
-                      //          PackageManager.COMPONENT_ENABLED_STATE_DISABLED, 0);
-                        //Toast.makeText(getApplicationContext(), "Change Password Cant be used to google login", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     }
                 }).addOnFailureListener(new OnFailureListener() {

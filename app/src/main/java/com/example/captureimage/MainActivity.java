@@ -90,12 +90,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         imageView = findViewById(R.id.imageView);
 //find textview
         textView = findViewById(R.id.textView);
-        googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-        googleSignInClient = GoogleSignIn.getClient(MainActivity.this,googleSignInOptions);
 
-        googleSignInAccount = GoogleSignIn.getLastSignedInAccount(MainActivity.this);
 
 //check app level permission is granted for Camera
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
@@ -271,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(intent);
         }
         if (id == R.id.changepassword) {
-            Intent intent = new Intent(MainActivity.this,change.class);
+            Intent intent = new Intent(MainActivity.this,changepass.class);
             Toast.makeText(this, "Change Password", Toast.LENGTH_SHORT).show();
             startActivity(intent);
         }

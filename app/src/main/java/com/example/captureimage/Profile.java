@@ -150,7 +150,7 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
             startActivity(intent);
         }
         if (id == R.id.changepassword) {
-            Intent intent = new Intent(Profile.this,change.class);
+            Intent intent = new Intent(Profile.this,changepass.class);
             Toast.makeText(this, "Change Password", Toast.LENGTH_SHORT).show();
             startActivity(intent);
         }
