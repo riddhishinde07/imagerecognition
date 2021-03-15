@@ -58,7 +58,7 @@ import com.squareup.picasso.Picasso;
 import java.util.Objects;
 
 
-public class display extends AppCompatActivity  {
+public class display extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     DrawerLayout drawerLayout;
     TextView text;
     EditText dpart,number;
@@ -71,6 +71,7 @@ public class display extends AppCompatActivity  {
     FirebaseUser user;
     FirebaseTranslator firebaseTranslator;
    Spinner spinner;
+    ActionBarDrawerToggle actionBarDrawerToggle;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @SuppressLint("SetTextI18n")
@@ -87,7 +88,12 @@ public class display extends AppCompatActivity  {
         storageReference = FirebaseStorage.getInstance().getReference();
         auth = FirebaseAuth.getInstance();
         fStore = FirebaseFirestore.getInstance();
-
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Close);
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.syncState();
+        //   getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        NavigationView navigationView = (NavigationView)findViewById(R.id.nv);
+        navigationView.setNavigationItemSelectedListener(this);
         user = auth.getCurrentUser();
         dpart = findViewById(R.id.dpart);
          number = findViewById(R.id.number);
@@ -234,7 +240,25 @@ public class display extends AppCompatActivity  {
     });
     }
 
-
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.image) {
+            Toast.makeText(this, "Capture Image", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(display.this,MainActivity.class);
+            startActivity(intent);
+        }
+        if (id == R.id.profile) {
+            Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(display.this,Profile.class);
+            startActivity(intent);
+        }
+        if (id == R.id.changepassword) {
+            Toast.makeText(this, "Change Password", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(display.this,change.class);
+            startActivity(intent);
+        }
+        return false;
+    }
 
     private void downloadModal(final String input) {
         FirebaseModelDownloadConditions conditions = new FirebaseModelDownloadConditions.Builder().requireWifi().build();
@@ -290,14 +314,15 @@ public class display extends AppCompatActivity  {
         }
     }
 
-    public void ClickImage(View view) {
+
+    /*public void ClickImage(View view) {
         //recreate activity
         redirectActivity(this, MainActivity.class);
 
     }
     public void ChangePassword(View view){
         //recreate activity
-        redirectActivity(this,changepass.class);
+        redirectActivity(this,change.class);
 
     }
     public void Profile(View view) {
@@ -307,7 +332,7 @@ public class display extends AppCompatActivity  {
     public void Display(View view) {
         //recreate activity
         redirectActivity(this, display.class);
-    }
+    }*/
 
     public static void redirectActivity(Activity activity, Class aClass) {
         //initialized intent

@@ -32,6 +32,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.captureimage.display;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -50,16 +54,19 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "camera";
     FirebaseAuth mAuth;
     ImageView imageView;
     DrawerLayout drawerLayout;
     TextView textView;
+    GoogleSignInClient googleSignInClient;
+    GoogleSignInOptions googleSignInOptions;
+    GoogleSignInAccount googleSignInAccount;
     File photoFile = null;
     static final int CAPTURE_IMAGE_REQUEST = 1;
     FileOutputStream outputStream;
-
+    ActionBarDrawerToggle actionBarDrawerToggle;
     String mCurrentPhotoPath;
     private static final String IMAGE_DIRECTORY_NAME = "Image";
 
@@ -70,13 +77,25 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         drawerLayout = findViewById(R.id.drawer_layout);
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Close);
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.syncState();
+     //   getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        NavigationView navigationView = (NavigationView)findViewById(R.id.nv);
+        navigationView.setNavigationItemSelectedListener(this);
         mAuth = FirebaseAuth.getInstance();
-//find imageview
+
+        //find imageview
 
         imageView = findViewById(R.id.imageView);
 //find textview
         textView = findViewById(R.id.textView);
+        googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        googleSignInClient = GoogleSignIn.getClient(MainActivity.this,googleSignInOptions);
 
+        googleSignInAccount = GoogleSignIn.getLastSignedInAccount(MainActivity.this);
 
 //check app level permission is granted for Camera
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
@@ -85,29 +104,36 @@ public class MainActivity extends AppCompatActivity {
                     101);
         }
 
-               imageView.setOnClickListener(new View.OnClickListener() {
-                   @Override
-                   public void onClick(View v) {
-                       Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                       startActivityForResult(intent, 101);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(intent, 101);
 
 
-                   }
-               });
+            }
+        });
 
     }
 
-        private void createCustomFile(String fileName){
-            Context context = null ;
-            File path= new File(context.getFilesDir(), "MyAppName" + File.separator + "Images");
-            if(!path.exists()){
-                path.mkdirs();
-            }
-            File outFile = new File(path, fileName + ".jpeg");
-            //now we can create FileOutputStream and write something to file
-
-
+    public boolean onOptionItemSelected(MenuItem item) {
+        if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
         }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void createCustomFile(String fileName) {
+        Context context = null;
+        File path = new File(context.getFilesDir(), "MyAppName" + File.separator + "Images");
+        if (!path.exists()) {
+            path.mkdirs();
+        }
+        File outFile = new File(path, fileName + ".jpeg");
+        //now we can create FileOutputStream and write something to file
+
+
+    }
 
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -134,8 +160,6 @@ public class MainActivity extends AppCompatActivity {
             public void onSuccess(FirebaseVisionText firebaseVisionText) {
 
                 String s = firebaseVisionText.getText();
-
-
                 Intent intent = new Intent(MainActivity.this, display.class);
                 intent.putExtra("", s);
                 startActivity(intent);
@@ -164,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void ClickLogo(View view) {
+  public void ClickLogo(View view) {
         //close drawer
         closeDrawer(drawerLayout);
     }
@@ -176,17 +200,33 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+    public void ClickLogout(View view) {
+        //recreate activity
+        logout();
+    }
 
-    public void ClickImage(View view) {
+    public void logout() {
+        mAuth.signOut();
+        finish();
+
+        Intent intent = new Intent(MainActivity.this, login.class);
+        Toast.makeText(MainActivity.this, "Logged Out Successfully.", Toast.LENGTH_LONG).show();
+        startActivity(intent);
+
+    }
+
+    /*public void ClickImage(View view) {
         //recreate activity
         recreate();
 
     }
-    public void ChangePassword(View view){
+
+    public void ChangePassword(View view) {
         //recreate activity
-        redirectActivity(this,changepass.class);
+        redirectActivity(this, changepass.class);
 
     }
+
     public void Profile(View view) {
         //recreate activity
         redirectActivity(this, Profile.class);
@@ -208,21 +248,34 @@ public class MainActivity extends AppCompatActivity {
         logout();
     }
 
-    public void logout() {
-        mAuth.signOut();
-        finish();
 
-        Intent intent = new Intent(MainActivity.this, login.class);
-        Toast.makeText(MainActivity.this, "Logged Out Successfully.", Toast.LENGTH_LONG).show();
-        startActivity(intent);
-
-    }
 
     @Override
     protected void onPause() {
         super.onPause();
         //close drawer
         closeDrawer(drawerLayout);
+    }*/
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.image) {
+            Intent intent = new Intent(MainActivity.this,MainActivity.class);
+            Toast.makeText(this, "Capture Image", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+        }
+        if (id == R.id.profile) {
+            Intent intent = new Intent(MainActivity.this,Profile.class);
+            Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+        }
+        if (id == R.id.changepassword) {
+            Intent intent = new Intent(MainActivity.this,change.class);
+            Toast.makeText(this, "Change Password", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+        }
+        return false;
     }
 }
 

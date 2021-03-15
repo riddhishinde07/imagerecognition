@@ -39,7 +39,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.protobuf.Api;
 
 
-public class login extends AppCompatActivity {
+public class login extends AppCompatActivity  {
     FirebaseAuth mAuth;
     GoogleSignInClient mGoogleSignInClient;
     //code you will assign for starting the new activity.
@@ -49,6 +49,8 @@ public class login extends AppCompatActivity {
     ImageView profile1;
     FirebaseAuth auth;
     DrawerLayout drawerLayout;
+    GoogleSignInAccount googleSignInAccount;
+    ActionBarDrawerToggle actionBarDrawerToggle;
     private ActionBarDrawerToggle t;
     private NavigationView nv;
 
@@ -63,19 +65,27 @@ public class login extends AppCompatActivity {
         password = (TextView) findViewById(R.id.edtpassword);
         profile1 = findViewById(R.id.profile1);
         drawerLayout = findViewById(R.id.drawer_layout);
-    final TextView change = findViewById(R.id.change);
+ //   final TextView change = findViewById(R.id.change);
         //creating object instance
         mAuth = FirebaseAuth.getInstance();
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Close);
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.syncState();
+        //   getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    //    NavigationView navigationView = (NavigationView)findViewById(R.id.nv);
+      //  navigationView.setNavigationItemSelectedListener(this);
         //Use to configure sign in api
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("247322205294-i9qn10pree5fjfupldkkd8m3jqm49gfu.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
 
-      /*  GoogleSignInAccount signInAccount =  GoogleSignIn.getLastSignedInAccount(this);
+    /*   GoogleSignInAccount signInAccount =  GoogleSignIn.getLastSignedInAccount(this);
         if(signInAccount != null){
             startActivity(new Intent(this,MainActivity.class));
         }*/
+
+
 
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
@@ -88,8 +98,6 @@ public class login extends AppCompatActivity {
             public void onClick(View v) {
                 Intent signInIntent = mGoogleSignInClient.getSignInIntent();
                 startActivityForResult(signInIntent, RC_SIGN_IN);
-
-
 
             }
         });
@@ -111,41 +119,6 @@ public class login extends AppCompatActivity {
                 Intent in = new Intent(login.this, reset.class);
                 startActivity(in);
             }
-        });
-        t = new ActionBarDrawerToggle(this, drawerLayout,R.string.Open, R.string.Close);
-
-        drawerLayout.addDrawerListener(t);
-        t.syncState();
-
-
-
-        nv = (NavigationView)findViewById(R.id.nv);
-        nv.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
-                switch(id)
-                {
-                    case R.id.image:
-                        Toast.makeText(login.this, "Capture Image",Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.profile:
-                        Toast.makeText(login.this, "Profile",Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(getApplicationContext(), Profile.class));
-                        break;
-                    case R.id.changepassword:
-                        Toast.makeText(login.this, "Change Password",Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(getApplicationContext(), changepass.class));
-                        break;
-                    default:
-                        return true;
-                }
-
-
-                return true;
-
-            }
-
         });
 
 
@@ -173,10 +146,9 @@ public class login extends AppCompatActivity {
                         if (task.isSuccessful()) {
 
                             Toast.makeText(login.this, "Logged in Successfully", Toast.LENGTH_SHORT).show();
-                            LinearLayout linearlayout=(LinearLayout)findViewById(R.id.changepass1);
-
-                            linearlayout.setVisibility(View.VISIBLE);
                             startActivity(new Intent(getApplicationContext(), MainActivity.class));
+
+
                         } else {
                             Toast.makeText(login.this, "Error ! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
 
@@ -212,8 +184,12 @@ public class login extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Toast.makeText(getApplicationContext(), "Logged in Successfully", Toast.LENGTH_SHORT).show();
-
-                        startActivity(new Intent(getApplicationContext(),MainActivity.class));
+                       // startActivity(new Intent(getApplicationContext(),MainActivity.class));
+                  //      PackageManager pm = getPackageManager();
+                    //    pm.setComponentEnabledSetting(new ComponentName(login.this, change.class),
+                      //          PackageManager.COMPONENT_ENABLED_STATE_DISABLED, 0);
+                        //Toast.makeText(getApplicationContext(), "Change Password Cant be used to google login", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -228,4 +204,33 @@ public class login extends AppCompatActivity {
 
         }
     }
+  /* public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.image) {
+            Intent intent = new Intent(login.this,MainActivity.class);
+            Toast.makeText(this, "Capture Image", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+        }
+        if (id == R.id.profile) {
+            Intent intent = new Intent(login.this,Profile.class);
+            Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+        }
+        if (id == R.id.changepassword) {
+            googleSignInAccount = GoogleSignIn.getLastSignedInAccount(login.this);
+            if (googleSignInAccount != null) {
+
+                PackageManager pm = getPackageManager();
+                pm.setComponentEnabledSetting(new ComponentName(this, changepass.class),
+                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED, 0);
+                Toast.makeText(getApplicationContext(), "Change Password Cant be used to google login", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            } else {
+                Intent intent = new Intent(login.this, changepass.class);
+                Toast.makeText(this, "Change Password", Toast.LENGTH_SHORT).show();
+                startActivity(intent);
+            }
+        }
+        return false;
+    }*/
 }

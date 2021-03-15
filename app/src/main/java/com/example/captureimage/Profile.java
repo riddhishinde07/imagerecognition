@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -29,6 +31,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -43,7 +46,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.regex.Pattern;
 
-public class Profile extends AppCompatActivity {
+public class Profile extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     TextView name,name1,email1,email,text;
     FirebaseAuth auth;
     FirebaseFirestore fStore;
@@ -56,6 +59,7 @@ public class Profile extends AppCompatActivity {
     GoogleSignInAccount account;
     GoogleSignInClient mGoogleSignInClient;
     LinearLayout linearLayout;
+    ActionBarDrawerToggle actionBarDrawerToggle;
 
     @SuppressLint({"SetTextI18n", "CheckResult", "CutPasteId"})
     @Override
@@ -76,8 +80,15 @@ public class Profile extends AppCompatActivity {
         user = auth.getCurrentUser();
 
         storageReference = FirebaseStorage.getInstance().getReference();
-        drawerLayout = findViewById(R.id.drawer_layout);
 
+        drawerLayout = findViewById(R.id.drawer_layout);
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Close);
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.syncState();
+        //   getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        NavigationView navigationView = (NavigationView)findViewById(R.id.nv);
+        navigationView.setNavigationItemSelectedListener(this);
+        auth = FirebaseAuth.getInstance();
 
         StorageReference profileRef = storageReference.child("users/" + auth.getCurrentUser().getUid() + "profile.jpg");
         profileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -120,11 +131,31 @@ public class Profile extends AppCompatActivity {
 
                 name1.setText(user.getDisplayName());
                 email1.setText(user.getEmail());
+                profile1.setVisibility(View.INVISIBLE);
             }
         });
 
     }
 
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.image) {
+            Intent intent = new Intent(Profile.this,MainActivity.class);
+            Toast.makeText(this, "Capture Image", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+        }
+        if (id == R.id.profile) {
+            Intent intent = new Intent(Profile.this,Profile.class);
+            Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+        }
+        if (id == R.id.changepassword) {
+            Intent intent = new Intent(Profile.this,change.class);
+            Toast.makeText(this, "Change Password", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+        }
+        return false;
+    }
     protected void onActivityResult(int requestCode,int resultCode, @androidx.annotation.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1000) {
@@ -150,7 +181,7 @@ public class Profile extends AppCompatActivity {
                     @Override
                     public void onSuccess(Uri uri) {
 
-                        Picasso.get().load(uri).into(profile);
+                        Picasso.get().load(uri).into(profile1);
 
                     }
                 });
@@ -187,7 +218,23 @@ public class Profile extends AppCompatActivity {
 
         }
     }
-    public void ClickImage(View view){
+    public void ClickLogout(View view) {
+        //recreate activity
+        logout();
+    }
+
+
+    public  void logout(){
+
+        auth.signOut();
+        finish();
+
+        Intent intent = new Intent(Profile.this, login.class);
+        Toast.makeText(Profile.this, "Logged Out Successfully.", Toast.LENGTH_LONG).show();
+        startActivity(intent);
+
+    }
+   /* public void ClickImage(View view){
         //recreate activity
         redirectActivity(this,MainActivity.class);
 
@@ -214,29 +261,14 @@ public class Profile extends AppCompatActivity {
 
     }
 
-    public void ClickLogout(View view) {
-        //recreate activity
-        logout();
-    }
 
-
-    public  void logout(){
-
-        auth.signOut();
-        finish();
-
-        Intent intent = new Intent(Profile.this, login.class);
-        Toast.makeText(Profile.this, "Logged Out Successfully.", Toast.LENGTH_LONG).show();
-        startActivity(intent);
-
-    }
 
     @Override
     protected void onPause() {
         super.onPause();
         //close drawer
         closeDrawer(drawerLayout);
-    }
+    }*/
 
 }
 
