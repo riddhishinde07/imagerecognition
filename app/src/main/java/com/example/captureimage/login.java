@@ -137,12 +137,14 @@ public class login extends AppCompatActivity   {
         });
 
 
+
         sign_in.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // profile1.setVisibility(View.VISIBLE);
                 String Email = email.getText().toString().trim();
                 String Password = password.getText().toString().trim();
+                SharedPreferences preferences = getSharedPreferences("MYPREF",MODE_PRIVATE);
 
                 if (TextUtils.isEmpty(Email)) {
                     email.setError("Email is Required.");
@@ -154,24 +156,12 @@ public class login extends AppCompatActivity   {
                     return;
                 }
                 //checks the emailid or password in registered or not
-                mAuth.signInWithEmailAndPassword(Email, Password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-
-                            Toast.makeText(login.this, "Logged in Successfully", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
 
 
-                        } else {
-                            Toast.makeText(login.this, "Error ! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(login.this,MainActivity.class);
 
-                        }
+                startActivity(intent);
 
-                    }
-
-
-                });
             }
         });
     }
@@ -190,52 +180,30 @@ public class login extends AppCompatActivity   {
     }
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            handleSignInResult(result);
+        Task<GoogleSignInAccount> signInTask = GoogleSignIn.getSignedInAccountFromIntent(data);
+        try {
+            GoogleSignInAccount signInAcc = signInTask.getResult(ApiException.class);
+            AuthCredential authCredential = GoogleAuthProvider.getCredential(signInAcc.getIdToken(),null);
+            mAuth.signInWithCredential(authCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    Toast.makeText(getApplicationContext(), "Logged in Successfully", Toast.LENGTH_SHORT).show();
+
+                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+
+                }
+            });
+
+        } catch (ApiException e) {
+            e.printStackTrace();
         }
-    }
 
-    private void handleSignInResult(GoogleSignInResult result) {
-        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
-        if (result.isSuccess()) {
-            // Signed in successfully, show authenticated UI.
-            GoogleSignInAccount acct = result.getSignInAccount();
-
-            String personName = acct.getDisplayName();
-            String personEmail = acct.getEmail();
-            String personId = acct.getId();
- /*     Uri personPhoto = acct.getPhotoUrl();
-        String idToken = acct.getIdToken();
-        mIdTokenTextView.setText("ID Token: " + idToken);*/
-
-            SharedPreferences sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor =sharedPref.edit();
-            editor.putString("username",personName.toString());
-            editor.putString("email", personEmail.toString());
-            editor.apply();
-
-
-            Toast.makeText(this, personName+""+personEmail, Toast.LENGTH_SHORT).show();
-            Toast.makeText(this, "Sign In", Toast.LENGTH_SHORT).show();
-        } else {
-            // Signed out, show unauthenticated UI.
-            Toast.makeText(this, "Sign Out", Toast.LENGTH_SHORT).show();
-            //mIdTokenTextView.setText("ID Token: null");
-        }
-    }
-    public void saveISLogged_IN(Context context, Boolean isLoggedin) {
-        sharepreferences = PreferenceManager
-                .getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = sharepreferences.edit();
-        editor.putBoolean("IS_LOGIN", isLoggedin);
-        editor.commit();
-    }
-
-    public boolean getISLogged_IN(Context context) {
-        sharepreferences = PreferenceManager
-                .getDefaultSharedPreferences(context);
-        return sharepreferences.getBoolean("IS_LOGIN", false);
     }
 
     private void redirectToHome() {

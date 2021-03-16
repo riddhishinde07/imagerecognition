@@ -51,7 +51,7 @@ import com.squareup.picasso.Picasso;
 import java.util.regex.Pattern;
 
 public class Profile extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    TextView name,name1,email1,email,text,change;
+    TextView name,name1,email1,email,text,change,only;
     FirebaseAuth auth;
     FirebaseFirestore fStore;
     FirebaseUser user;
@@ -80,9 +80,10 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
         auth = FirebaseAuth.getInstance();
         fStore = FirebaseFirestore.getInstance();
         change = findViewById(R.id.change);
-        linearLayout = findViewById(R.id.click);
+        only = findViewById(R.id.onlyif);
         userID = auth.getCurrentUser().getUid();
         user = auth.getCurrentUser();
+
 
         storageReference = FirebaseStorage.getInstance().getReference();
 
@@ -96,11 +97,23 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
         navigationView.setNavigationItemSelectedListener(this);
         auth = FirebaseAuth.getInstance();
 
+        name1.setText(user.getDisplayName());
+        email1.setText(user.getEmail());
+
         change.setVisibility(View.INVISIBLE);
         profile1.setVisibility(View.INVISIBLE);
 
-        name1.setText(user.getDisplayName());
-        email1.setText(user.getEmail());
+
+        only.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                change.setVisibility(View.VISIBLE);
+                profile1.setVisibility(View.VISIBLE);
+            }
+        });
+
+
+
 
         StorageReference profileRef = storageReference.child("users/" + auth.getCurrentUser().getUid() + "profile.jpg");
         profileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -128,7 +141,7 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
         });
 
 
-        DocumentReference documentReference1 = fStore.collection("users").document(userID);
+       DocumentReference documentReference1 = fStore.collection("users").document(userID);
         documentReference1.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {

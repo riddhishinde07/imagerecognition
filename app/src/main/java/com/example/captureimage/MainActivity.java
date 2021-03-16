@@ -14,6 +14,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     FileOutputStream outputStream;
     ActionBarDrawerToggle actionBarDrawerToggle;
     String mCurrentPhotoPath;
+    SharedPreferences sharedPreferences;
     private static final String IMAGE_DIRECTORY_NAME = "Image";
 
 
@@ -89,15 +91,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .requestEmail()
                 .build();
 
-    /*   GoogleSignInAccount signInAccount =  GoogleSignIn.getLastSignedInAccount(this);
-        if(signInAccount != null){
-            startActivity(new Intent(this,MainActivity.class));
-        }*/
 
-
-
-
-        googleSignInClient = GoogleSignIn.getClient(this, gso);
+            googleSignInClient = GoogleSignIn.getClient(this, gso);
 
         //find imageview
 
@@ -235,6 +230,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(intent);
         }
         if (id == R.id.profile) {
+            Intent intent = new Intent(MainActivity.this,Profile.class);
+            Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+        }
+        if (id == R.id.changepassword) {
+
             Intent intent = new Intent(MainActivity.this,Profile.class);
             Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
             startActivity(intent);

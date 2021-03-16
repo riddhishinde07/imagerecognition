@@ -1,3 +1,5 @@
+
+
 package com.example.captureimage;
 
 import android.annotation.SuppressLint;
@@ -95,38 +97,37 @@ public class Register extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
 
-                                            if (task.isSuccessful()) {
-                                               //validatePassword();
-                                                Toast.makeText(Register.this, "Successfully Registered, Upload complete!", Toast.LENGTH_SHORT).show();
-                                                finish();
-                                                startActivity(new Intent(Register.this, login.class));
-                                                userID = auth.getCurrentUser().getUid();
-                                                DocumentReference documentReference = fStore.collection("users").document(userID);
-                                                Map<String,Object> user = new HashMap<>();
-                                                user.put("Name",name);
-                                                user.put("Email",email);
-                                                documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        Log.d(TAG,"Data is added"+userID);
+                                if (task.isSuccessful()) {
+                                    //validatePassword();
+                                    Toast.makeText(Register.this, "Successfully Registered, Upload complete!", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                    startActivity(new Intent(Register.this, login.class));
+                                    userID = auth.getCurrentUser().getUid();
+                                    DocumentReference documentReference = fStore.collection("users").document(userID);
+                                    Map<String,Object> user = new HashMap<>();
+                                    user.put("Name",name);
+                                    user.put("Email",email);
+                                    documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.d(TAG,"Data is added"+userID);
 
-                                                    }
-                                                });
+                                        }
+                                    });
 
-                                              startActivity(new Intent(getApplicationContext(),login.class));
-                                            }
+                                    startActivity(new Intent(getApplicationContext(),login.class));
+                                }
 
-                                 else {
+                                else {
                                     Toast.makeText(Register.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                                 }
+                                }
                             }
                         });
 
             }
-    });
-        }
+        });
     }
-
+}
 
 
 
