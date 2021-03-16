@@ -85,6 +85,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
         mAuth = FirebaseAuth.getInstance();
 
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+    /*   GoogleSignInAccount signInAccount =  GoogleSignIn.getLastSignedInAccount(this);
+        if(signInAccount != null){
+            startActivity(new Intent(this,MainActivity.class));
+        }*/
+
+
+
+
+        googleSignInClient = GoogleSignIn.getClient(this, gso);
+
         //find imageview
 
         imageView = findViewById(R.id.imageView);
@@ -225,11 +239,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
             startActivity(intent);
         }
-        if (id == R.id.changepassword) {
-            Intent intent = new Intent(MainActivity.this,password.class);
-            Toast.makeText(this, "Change Password", Toast.LENGTH_SHORT).show();
-            startActivity(intent);
-        }
+
+
         return false;
     }
 }

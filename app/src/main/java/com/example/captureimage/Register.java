@@ -2,6 +2,7 @@ package com.example.captureimage;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -69,10 +70,10 @@ public class Register extends AppCompatActivity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-              final String Name = name.getText().toString().trim();
-                final String Email = email.getText().toString().trim();
-                String Password = password.getText().toString().trim();
 
+                String Name = name.getText().toString();
+                String Password = password.getText().toString();
+                String Email = email.getText().toString();
 
                 // register the user in firebase
                 if (TextUtils.isEmpty(Name)) {
@@ -102,8 +103,8 @@ public class Register extends AppCompatActivity {
                                                 userID = auth.getCurrentUser().getUid();
                                                 DocumentReference documentReference = fStore.collection("users").document(userID);
                                                 Map<String,Object> user = new HashMap<>();
-                                                user.put("Name",Name);
-                                                user.put("Email",Email);
+                                                user.put("Name",name);
+                                                user.put("Email",email);
                                                 documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
@@ -124,60 +125,6 @@ public class Register extends AppCompatActivity {
             }
     });
         }
-  /*  private boolean validatePassword() {
-        String passwordInput = password.getText().toString().trim();
-
-        if (passwordInput.isEmpty()) {
-            password.setError("Field can not be empty");
-            return false;
-        }
-
-
-        else if (!PASSWORD_PATTERN.matcher(passwordInput).matches()) {
-            password.setError("Password is too weak");
-            return false;
-        } else {
-            password.setError(null);
-            return true;
-        }
-    }
-    private boolean validateEmail() {
-        String emailInput = email.getText().toString().trim();
-        if (emailInput.isEmpty()) {
-            email.setError("Field can't be empty");
-            return false;
-        } else if (!Patterns.EMAIL_ADDRESS.matcher(emailInput).matches()) {
-            email.setError("Please enter a valid email address");
-            return false;
-        } else {
-            email.setError(null);
-            return true;
-        }
-    }
-    private boolean validateUsername() {
-        String usernameInput = name.getText().toString().trim();
-        if (usernameInput.isEmpty()) {
-            name.setError("Field can't be empty");
-            return false;
-        } else if (usernameInput.length() > 15) {
-            name.setError("Username too long");
-            return false;
-        } else {
-            name.setError(null);
-            return true;
-        }
-    }
-  public void confirmInput(View v) {
-        if (!validateEmail() | !validateUsername() | !validatePassword()) {
-            return;
-        }
-        String input = "Email: " + email.getText().toString();
-        input += "\n";
-        input += "Username: " + name.getText().toString();
-        input += "\n";
-        input += "Password: " + password.getText().toString();
-        Toast.makeText(this, input, Toast.LENGTH_SHORT).show();
-    }*/
     }
 
 

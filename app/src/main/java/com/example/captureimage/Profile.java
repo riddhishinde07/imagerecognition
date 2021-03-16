@@ -3,11 +3,15 @@ package com.example.captureimage;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -47,7 +51,7 @@ import com.squareup.picasso.Picasso;
 import java.util.regex.Pattern;
 
 public class Profile extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    TextView name,name1,email1,email,text;
+    TextView name,name1,email1,email,text,change;
     FirebaseAuth auth;
     FirebaseFirestore fStore;
     FirebaseUser user;
@@ -60,6 +64,7 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
     GoogleSignInClient mGoogleSignInClient;
     LinearLayout linearLayout;
     ActionBarDrawerToggle actionBarDrawerToggle;
+    SharedPreferences sharedPreferences;
 
     @SuppressLint({"SetTextI18n", "CheckResult", "CutPasteId"})
     @Override
@@ -74,68 +79,67 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
         email1 = findViewById(R.id.email1);
         auth = FirebaseAuth.getInstance();
         fStore = FirebaseFirestore.getInstance();
-
+        change = findViewById(R.id.change);
         linearLayout = findViewById(R.id.click);
         userID = auth.getCurrentUser().getUid();
         user = auth.getCurrentUser();
 
         storageReference = FirebaseStorage.getInstance().getReference();
 
+
         drawerLayout = findViewById(R.id.drawer_layout);
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Close);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
         //   getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        NavigationView navigationView = (NavigationView)findViewById(R.id.nv);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nv);
         navigationView.setNavigationItemSelectedListener(this);
         auth = FirebaseAuth.getInstance();
+
+        change.setVisibility(View.INVISIBLE);
+        profile1.setVisibility(View.INVISIBLE);
+
+        name1.setText(user.getDisplayName());
+        email1.setText(user.getEmail());
 
         StorageReference profileRef = storageReference.child("users/" + auth.getCurrentUser().getUid() + "profile.jpg");
         profileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                    Picasso.get().load(uri).into(profile1);
-
+                Picasso.get().load(uri).into(profile1);
             }
         });
 
-        linearLayout.setOnClickListener(new View.OnClickListener() {
+
+        change.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                profile1.setVisibility(View.VISIBLE);
+                Intent intent = new Intent(Profile.this, password.class);
+                startActivity(intent);
             }
         });
-            profile1.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    
-                    Intent openGallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(openGallery, 1000);
-                }
-            });
+        profile1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent openGallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(openGallery, 1000);
+            }
+        });
+
 
         DocumentReference documentReference1 = fStore.collection("users").document(userID);
         documentReference1.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
 
-                    name.setText(documentSnapshot.getString("Name"));
-                    email.setText(documentSnapshot.getString("Email"));
+                name.setText(documentSnapshot.getString("Name"));
+                email.setText(documentSnapshot.getString("Email"));
 
             }
         });
-        DocumentReference documentReference = fStore.collection("users").document(userID);
-        documentReference.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-
-                name1.setText(user.getDisplayName());
-                email1.setText(user.getEmail());
-                profile1.setVisibility(View.INVISIBLE);
-            }
-        });
-
     }
+
 
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
@@ -145,15 +149,14 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
             startActivity(intent);
         }
         if (id == R.id.profile) {
-            Intent intent = new Intent(Profile.this,Profile.class);
-            Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
-            startActivity(intent);
-        }
-        if (id == R.id.changepassword) {
-            Intent intent = new Intent(Profile.this,password.class);
-            Toast.makeText(this, "Change Password", Toast.LENGTH_SHORT).show();
-            startActivity(intent);
-        }
+
+                    change.setVisibility(View.VISIBLE);
+                    profile1.setVisibility(View.VISIBLE);
+                    Intent intent = new Intent(Profile.this,Profile.class);
+
+                    Toast.makeText(Profile.this, "Profile", Toast.LENGTH_SHORT).show();
+                    startActivity(intent);
+                }
         return false;
     }
     protected void onActivityResult(int requestCode,int resultCode, @androidx.annotation.Nullable Intent data) {
@@ -163,9 +166,6 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
                 Uri imageUri = data.getData();
                 //  profile.setImageURI(imageUri);
                 uploadImage(imageUri);
-
-
-
 
             }
         }
@@ -271,4 +271,3 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
     }*/
 
 }
-

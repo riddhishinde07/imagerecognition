@@ -1,10 +1,14 @@
 package com.example.captureimage;
 
+import android.annotation.SuppressLint;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -21,10 +25,12 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -38,9 +44,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.protobuf.Api;
 
+import java.util.prefs.PreferenceChangeListener;
 
-public class login extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener  {
+
+public class login extends AppCompatActivity   {
+    private static final String TAG = "";
     FirebaseAuth mAuth;
+    Boolean isLoggin = false;
     GoogleSignInClient mGoogleSignInClient;
     //code you will assign for starting the new activity.
     private static int RC_SIGN_IN = 1;
@@ -53,6 +63,8 @@ public class login extends AppCompatActivity implements NavigationView.OnNavigat
     ActionBarDrawerToggle actionBarDrawerToggle;
     private ActionBarDrawerToggle t;
     private NavigationView nv;
+    Boolean IsLoggedIn;
+    SharedPreferences sharepreferences;
 
 
 
@@ -65,15 +77,17 @@ public class login extends AppCompatActivity implements NavigationView.OnNavigat
         password = (TextView) findViewById(R.id.edtpassword);
         profile1 = findViewById(R.id.profile1);
         drawerLayout = findViewById(R.id.drawer_layout);
- //   final TextView change = findViewById(R.id.change);
+        //   final TextView change = findViewById(R.id.change);
         //creating object instance
+
         mAuth = FirebaseAuth.getInstance();
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Close);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
+
         actionBarDrawerToggle.syncState();
         //   getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    //    NavigationView navigationView = (NavigationView)findViewById(R.id.nv);
-      //  navigationView.setNavigationItemSelectedListener(this);
+        //    NavigationView navigationView = (NavigationView)findViewById(R.id.nv);
+        //  navigationView.setNavigationItemSelectedListener(this);
         //Use to configure sign in api
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("247322205294-i9qn10pree5fjfupldkkd8m3jqm49gfu.apps.googleusercontent.com")
@@ -96,13 +110,13 @@ public class login extends AppCompatActivity implements NavigationView.OnNavigat
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent signInIntent = mGoogleSignInClient.getSignInIntent();
                 startActivityForResult(signInIntent, RC_SIGN_IN);
 
 
             }
         });
-
 
         signup = (TextView) findViewById(R.id.signup);
         signup.setOnClickListener(new View.OnClickListener() {
@@ -126,10 +140,9 @@ public class login extends AppCompatActivity implements NavigationView.OnNavigat
         sign_in.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              // profile1.setVisibility(View.VISIBLE);
+                // profile1.setVisibility(View.VISIBLE);
                 String Email = email.getText().toString().trim();
                 String Password = password.getText().toString().trim();
-
 
                 if (TextUtils.isEmpty(Email)) {
                     email.setError("Email is Required.");
@@ -162,64 +175,84 @@ public class login extends AppCompatActivity implements NavigationView.OnNavigat
             }
         });
     }
-     protected  void  onStart() {
-
-         super.onStart();
-         if(FirebaseAuth.getInstance().getCurrentUser() !=null){
-             startActivity(new Intent(getApplicationContext(),MainActivity.class));
-             finish();
-         }
 
 
-     }
+
+    protected  void  onStart() {
+
+        super.onStart();
+        if(FirebaseAuth.getInstance().getCurrentUser() !=null){
+            startActivity(new Intent(getApplicationContext(),MainActivity.class));
+            finish();
+        }
+
+
+    }
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-
         if (requestCode == RC_SIGN_IN) {
-            Task<GoogleSignInAccount> signInTask = GoogleSignIn.getSignedInAccountFromIntent(data);
-            try {
-                GoogleSignInAccount signInAcc = signInTask.getResult(ApiException.class);
-                AuthCredential authCredential = GoogleAuthProvider.getCredential(signInAcc.getIdToken(),null);
-                mAuth.signInWithCredential(authCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Toast.makeText(getApplicationContext(), "Logged in Successfully", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-
-
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-
-                    }
-                });
-
-            } catch (ApiException e) {
-                e.printStackTrace();
-            }
-
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            handleSignInResult(result);
         }
     }
-  public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.image) {
-            Intent intent = new Intent(login.this,MainActivity.class);
-            Toast.makeText(this, "Capture Image", Toast.LENGTH_SHORT).show();
-            startActivity(intent);
-        }
-        if (id == R.id.profile) {
-            Intent intent = new Intent(login.this,Profile.class);
-            Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
-            startActivity(intent);
-        }
-        if (id == R.id.changepassword) {
-                Intent intent = new Intent(login.this, password.class);
-                Toast.makeText(this, "Change Password", Toast.LENGTH_SHORT).show();
-                startActivity(intent);
-            }
 
-        return false;
+    private void handleSignInResult(GoogleSignInResult result) {
+        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
+        if (result.isSuccess()) {
+            // Signed in successfully, show authenticated UI.
+            GoogleSignInAccount acct = result.getSignInAccount();
+
+            String personName = acct.getDisplayName();
+            String personEmail = acct.getEmail();
+            String personId = acct.getId();
+ /*     Uri personPhoto = acct.getPhotoUrl();
+        String idToken = acct.getIdToken();
+        mIdTokenTextView.setText("ID Token: " + idToken);*/
+
+            SharedPreferences sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor =sharedPref.edit();
+            editor.putString("username",personName.toString());
+            editor.putString("email", personEmail.toString());
+            editor.apply();
+
+
+            Toast.makeText(this, personName+""+personEmail, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Sign In", Toast.LENGTH_SHORT).show();
+        } else {
+            // Signed out, show unauthenticated UI.
+            Toast.makeText(this, "Sign Out", Toast.LENGTH_SHORT).show();
+            //mIdTokenTextView.setText("ID Token: null");
+        }
     }
+    public void saveISLogged_IN(Context context, Boolean isLoggedin) {
+        sharepreferences = PreferenceManager
+                .getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharepreferences.edit();
+        editor.putBoolean("IS_LOGIN", isLoggedin);
+        editor.commit();
+    }
+
+    public boolean getISLogged_IN(Context context) {
+        sharepreferences = PreferenceManager
+                .getDefaultSharedPreferences(context);
+        return sharepreferences.getBoolean("IS_LOGIN", false);
+    }
+
+    private void redirectToHome() {
+        startActivity(new Intent(login.this, MainActivity.class));
+        finish();
+    }
+    protected void onResume() {
+        super.onResume();
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+
+
+
 }
+
+

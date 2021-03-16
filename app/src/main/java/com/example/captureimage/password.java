@@ -59,6 +59,7 @@ public class password extends AppCompatActivity implements NavigationView.OnNavi
         drawerLayout = findViewById(R.id.drawer_layout);
         newpass = findViewById(R.id.newpass);
         oldpass = findViewById(R.id.oldpass);
+
         confirm = findViewById(R.id.confirm);
         changepass = findViewById(R.id.changepass);
         storageReference = FirebaseStorage.getInstance().getReference();
@@ -231,11 +232,8 @@ public class password extends AppCompatActivity implements NavigationView.OnNavi
             Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
             startActivity(intent);
         }
-        if (id == R.id.changepassword) {
-            Intent intent = new Intent(this,password.class);
-            Toast.makeText(this, "Change Password", Toast.LENGTH_SHORT).show();
-            startActivity(intent);
-        }
+
+
         return false;
     }
 
