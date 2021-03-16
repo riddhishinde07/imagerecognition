@@ -158,10 +158,24 @@ public class login extends AppCompatActivity   {
                 //checks the emailid or password in registered or not
 
 
-                Intent intent = new Intent(login.this,MainActivity.class);
+                mAuth.signInWithEmailAndPassword(Email, Password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
 
-                startActivity(intent);
+                            Toast.makeText(login.this, "Logged in Successfully", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
 
+
+                        } else {
+                            Toast.makeText(login.this, "Error ! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+
+                        }
+
+                    }
+
+
+                });
             }
         });
     }
