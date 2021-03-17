@@ -245,7 +245,7 @@ public class password extends AppCompatActivity {
             AlertDialog.Builder builder = new AlertDialog.Builder(
                     password.this);
             builder.setTitle("Change Password");
-            builder.setMessage("If You have Login Via Google?");
+            builder.setMessage("Are You logged in Via Google?");
 
                /* builder.setNeutralButton("Cancel",
                         new DialogInterface.OnClickListener() {
