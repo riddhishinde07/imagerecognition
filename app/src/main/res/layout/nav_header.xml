@@ -28,7 +28,7 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="ClickLogout"
+        android:onClick="Clicklogout"
         android:src="@drawable/ic_logout"/>
 
 

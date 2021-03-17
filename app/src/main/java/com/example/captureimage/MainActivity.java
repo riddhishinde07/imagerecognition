@@ -12,7 +12,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -55,7 +57,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity {
     private static final String TAG = "camera";
     FirebaseAuth mAuth;
     ImageView imageView;
@@ -68,9 +70,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     static final int CAPTURE_IMAGE_REQUEST = 1;
     FileOutputStream outputStream;
     ActionBarDrawerToggle actionBarDrawerToggle;
-    String mCurrentPhotoPath;
-    SharedPreferences sharedPreferences;
+
     private static final String IMAGE_DIRECTORY_NAME = "Image";
+    private long backPressedTime;
+    private Toast backToast;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -83,8 +86,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
      //   getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        NavigationView navigationView = (NavigationView)findViewById(R.id.nv);
-        navigationView.setNavigationItemSelectedListener(this);
+
         mAuth = FirebaseAuth.getInstance();
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -120,30 +122,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    public boolean onOptionItemSelected(MenuItem item) {
-        if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void createCustomFile(String fileName) {
-        Context context = null;
-        File path = new File(context.getFilesDir(), "MyAppName" + File.separator + "Images");
-        if (!path.exists()) {
-            path.mkdirs();
-        }
-        File outFile = new File(path, fileName + ".jpeg");
-        //now we can create FileOutputStream and write something to file
-
-
-    }
-
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        assert data != null;
         Bundle bundle = data.getExtras();
 //from bundle, extract the image
         Bitmap bitmap = (Bitmap) bundle.get("data");
@@ -181,6 +165,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
+    @Override
+    public void onBackPressed() {
+
+
+        if(backPressedTime + 2000 > System.currentTimeMillis() )
+        {
+            backToast.cancel();
+            super.onBackPressed();
+            return;
+        }
+        else
+        {
+            backToast =  Toast.makeText(getBaseContext(),"Press back to exit",Toast.LENGTH_SHORT);
+            backToast.show();
+        }
+        backPressedTime = System.currentTimeMillis();
+
+    }
+
     public void ClickMenu(View view) {
         //open drawer
         openDrawer(drawerLayout);
@@ -204,8 +207,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         }
     }
-    public void ClickLogout(View view) {
+    public void ClickImage(View view) {
         //recreate activity
+       recreate();
+
+    }
+    public void ChangePassword(View view){
+        //recreate activity
+        change();
+
+    }
+    public void Profile(View view) {
+        //recreate activity
+        redirectActivity(this, Profile.class);
+    }
+    public static void redirectActivity(Activity activity, Class aClass) {
+        //initialized intent
+        Intent intent = new Intent(activity, aClass);
+        //set flag
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        //start activity
+        activity.startActivity(intent);
+
+    }
+
+    public void Clicklogout(View view)
+    {
         logout();
     }
 
@@ -221,29 +248,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
 
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.image) {
-            Intent intent = new Intent(MainActivity.this,MainActivity.class);
-            Toast.makeText(this, "Capture Image", Toast.LENGTH_SHORT).show();
-            startActivity(intent);
-        }
-        if (id == R.id.profile) {
-            Intent intent = new Intent(MainActivity.this,Profile.class);
-            Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
-            startActivity(intent);
-        }
-        if (id == R.id.changepassword) {
 
-            Intent intent = new Intent(MainActivity.this,Profile.class);
-            Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
-            startActivity(intent);
-        }
+    private void change() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(
+                MainActivity.this);
+        builder.setTitle("Change Password");
+        builder.setMessage("If You have Login Via Google?");
+
+               /* builder.setNeutralButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,
+                                                int which) {
+                                Toast.makeText(getApplicationContext(), "Cancel is clicked", Toast.LENGTH_LONG).show();
+                            }
+                        });*/
+        builder.setNegativeButton("Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,
+                                        int which) {
+                        Toast.makeText(getApplicationContext(), "Cant change Password for google login", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                        startActivity(intent);
+                    }
+
+                });
+        builder.setPositiveButton("No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,
+                                        int which) {
+                        Intent intent = new Intent(MainActivity.this, password.class);
+                        startActivity(intent);
+                    }
+                });
 
 
-        return false;
+        builder.show();
+
     }
+
 }
 
 

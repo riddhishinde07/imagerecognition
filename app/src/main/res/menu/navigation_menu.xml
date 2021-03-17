@@ -12,7 +12,12 @@
     <item android:id="@+id/changepassword"
         android:icon="@drawable/ic_clipart_pen_svg"
         android:textColor="#03A9F4"
-        android:visible="false"
+        android:onClick="change"
         android:title="Change Pawwsord"/>
+    <item android:id="@+id/Logout"
+        android:icon="@drawable/ic_logout"
+        android:textColor="#03A9F4"
+        android:title="Logout"/>
+
 
 </menu>

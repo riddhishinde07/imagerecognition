@@ -76,15 +76,12 @@ public class login extends AppCompatActivity   {
         email = (TextView) findViewById(R.id.edtemail);
         password = (TextView) findViewById(R.id.edtpassword);
         profile1 = findViewById(R.id.profile1);
-        drawerLayout = findViewById(R.id.drawer_layout);
+
         //   final TextView change = findViewById(R.id.change);
         //creating object instance
 
         mAuth = FirebaseAuth.getInstance();
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Close);
-        drawerLayout.addDrawerListener(actionBarDrawerToggle);
 
-        actionBarDrawerToggle.syncState();
         //   getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //    NavigationView navigationView = (NavigationView)findViewById(R.id.nv);
         //  navigationView.setNavigationItemSelectedListener(this);
@@ -179,9 +176,6 @@ public class login extends AppCompatActivity   {
             }
         });
     }
-
-
-
     protected  void  onStart() {
 
         super.onStart();
@@ -189,7 +183,6 @@ public class login extends AppCompatActivity   {
             startActivity(new Intent(getApplicationContext(),MainActivity.class));
             finish();
         }
-
 
     }
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

@@ -7,11 +7,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.telephony.SmsManager;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +28,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
@@ -48,15 +54,16 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
-public class Profile extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class Profile extends AppCompatActivity  {
     TextView name,name1,email1,email,text,change,only;
     FirebaseAuth auth;
     FirebaseFirestore fStore;
     FirebaseUser user;
-    String userID;
-    ImageView profile,profile1;
+    String userID,userID1;
+    ImageView profile,profile1,add;
     DrawerLayout drawerLayout;
     StorageReference storageReference;
     GoogleSignInOptions gso;
@@ -66,6 +73,7 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
     ActionBarDrawerToggle actionBarDrawerToggle;
     SharedPreferences sharedPreferences;
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @SuppressLint({"SetTextI18n", "CheckResult", "CutPasteId"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,48 +81,36 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
         setContentView(R.layout.activity_profile);
         name = findViewById(R.id.name);
         text = findViewById(R.id.text);
+        profile = findViewById(R.id.profile);
         profile1 = findViewById(R.id.profile1);
         email = findViewById(R.id.email);
         name1 = findViewById(R.id.name1);
         email1 = findViewById(R.id.email1);
         auth = FirebaseAuth.getInstance();
         fStore = FirebaseFirestore.getInstance();
-        change = findViewById(R.id.change);
-        only = findViewById(R.id.onlyif);
-        userID = auth.getCurrentUser().getUid();
+        add = findViewById(R.id.addimg);
+
+        userID = Objects.requireNonNull(auth.getCurrentUser()).getUid();
         user = auth.getCurrentUser();
+       // userID1 = auth.getCurrentUser().getUid();
+        Glide.with(this)
+                .load(user.getPhotoUrl())
+                .into(profile);
+        name1.setText(user.getDisplayName());
+        email1.setText(user.getEmail());
+
 
 
         storageReference = FirebaseStorage.getInstance().getReference();
-
+        profile1.setVisibility(View.INVISIBLE);
 
         drawerLayout = findViewById(R.id.drawer_layout);
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Close);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
         //   getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nv);
-        navigationView.setNavigationItemSelectedListener(this);
+
         auth = FirebaseAuth.getInstance();
-
-        name1.setText(user.getDisplayName());
-        email1.setText(user.getEmail());
-
-        change.setVisibility(View.INVISIBLE);
-        profile1.setVisibility(View.INVISIBLE);
-
-
-        only.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                change.setVisibility(View.VISIBLE);
-                profile1.setVisibility(View.VISIBLE);
-            }
-        });
-
-
-
-
         StorageReference profileRef = storageReference.child("users/" + auth.getCurrentUser().getUid() + "profile.jpg");
         profileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
@@ -123,18 +119,17 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
             }
         });
 
-
-        change.setOnClickListener(new View.OnClickListener() {
+        add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Profile.this, password.class);
-                startActivity(intent);
+                profile1.setVisibility(View.VISIBLE);
+                profile.setVisibility(View.INVISIBLE);
+
             }
         });
         profile1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Intent openGallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(openGallery, 1000);
             }
@@ -151,27 +146,49 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
 
             }
         });
+
     }
 
 
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.image) {
-            Intent intent = new Intent(Profile.this,MainActivity.class);
-            Toast.makeText(this, "Capture Image", Toast.LENGTH_SHORT).show();
-            startActivity(intent);
-        }
-        if (id == R.id.profile) {
+    private void change() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(
+                Profile.this);
+        builder.setTitle("Change Password");
+        builder.setMessage("If You have Login Via Google?");
 
-                    change.setVisibility(View.VISIBLE);
-                    profile1.setVisibility(View.VISIBLE);
-                    Intent intent = new Intent(Profile.this,Profile.class);
+               /* builder.setNeutralButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,
+                                                int which) {
+                                Toast.makeText(getApplicationContext(), "Cancel is clicked", Toast.LENGTH_LONG).show();
+                            }
+                        });*/
+        builder.setNegativeButton("Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,
+                                        int which) {
+                        Toast.makeText(getApplicationContext(), "Cant change Password for google login", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(Profile.this, Profile.class);
+                        startActivity(intent);
+                    }
 
-                    Toast.makeText(Profile.this, "Profile", Toast.LENGTH_SHORT).show();
-                    startActivity(intent);
-                }
-        return false;
+                });
+        builder.setPositiveButton("No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,
+                                        int which) {
+                        Intent intent = new Intent(Profile.this, password.class);
+                        startActivity(intent);
+                    }
+                });
+
+
+        builder.show();
+
     }
+
+
+
     protected void onActivityResult(int requestCode,int resultCode, @androidx.annotation.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1000) {
@@ -231,12 +248,11 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
 
         }
     }
-    public void ClickLogout(View view) {
-        //recreate activity
+
+    public void Clicklogout(View view)
+    {
         logout();
     }
-
-
     public  void logout(){
 
         auth.signOut();
@@ -247,7 +263,7 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
         startActivity(intent);
 
     }
-   /* public void ClickImage(View view){
+    public void ClickImage(View view){
         //recreate activity
         redirectActivity(this,MainActivity.class);
 
@@ -259,7 +275,7 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
 
     public void ChangePassword(View view){
         //recreate activity
-        redirectActivity(this,changepass.class);
+        change();
 
     }
 
@@ -281,6 +297,6 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
         super.onPause();
         //close drawer
         closeDrawer(drawerLayout);
-    }*/
+    }
 
 }

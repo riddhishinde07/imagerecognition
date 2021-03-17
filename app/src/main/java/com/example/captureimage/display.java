@@ -58,7 +58,7 @@ import com.squareup.picasso.Picasso;
 import java.util.Objects;
 
 
-public class display extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class display extends AppCompatActivity {
     DrawerLayout drawerLayout;
     TextView text;
     EditText dpart,number;
@@ -92,8 +92,7 @@ public class display extends AppCompatActivity implements NavigationView.OnNavig
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
         //   getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        NavigationView navigationView = (NavigationView)findViewById(R.id.nv);
-        navigationView.setNavigationItemSelectedListener(this);
+
         user = auth.getCurrentUser();
         dpart = findViewById(R.id.dpart);
          number = findViewById(R.id.number);
@@ -240,22 +239,43 @@ public class display extends AppCompatActivity implements NavigationView.OnNavig
     });
     }
 
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.image) {
-            Toast.makeText(this, "Capture Image", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(display.this,MainActivity.class);
-            startActivity(intent);
-        }
-        if (id == R.id.profile) {
-            Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(display.this,Profile.class);
-            startActivity(intent);
-        }
 
-        return false;
+    private void change() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(
+                display.this);
+        builder.setTitle("Change Password");
+        builder.setMessage("If You have Login Via Google?");
+
+               /* builder.setNeutralButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,
+                                                int which) {
+                                Toast.makeText(getApplicationContext(), "Cancel is clicked", Toast.LENGTH_LONG).show();
+                            }
+                        });*/
+        builder.setNegativeButton("Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,
+                                        int which) {
+                        Toast.makeText(getApplicationContext(), "Cant change Password for google login", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(display.this, display.class);
+                        startActivity(intent);
+                    }
+
+                });
+        builder.setPositiveButton("No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,
+                                        int which) {
+                        Intent intent = new Intent(display.this, password.class);
+                        startActivity(intent);
+                    }
+                });
+
+
+        builder.show();
+
     }
-
     private void downloadModal(final String input) {
         FirebaseModelDownloadConditions conditions = new FirebaseModelDownloadConditions.Builder().requireWifi().build();
         firebaseTranslator.downloadModelIfNeeded(conditions).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -311,24 +331,21 @@ public class display extends AppCompatActivity implements NavigationView.OnNavig
     }
 
 
-    /*public void ClickImage(View view) {
+    public void ClickImage(View view) {
         //recreate activity
         redirectActivity(this, MainActivity.class);
 
     }
     public void ChangePassword(View view){
         //recreate activity
-        redirectActivity(this,change.class);
+       change();
 
     }
     public void Profile(View view) {
         //recreate activity
         redirectActivity(this, Profile.class);
     }
-    public void Display(View view) {
-        //recreate activity
-        redirectActivity(this, display.class);
-    }*/
+
 
     public static void redirectActivity(Activity activity, Class aClass) {
         //initialized intent
@@ -339,13 +356,13 @@ public class display extends AppCompatActivity implements NavigationView.OnNavig
         activity.startActivity(intent);
 
     }
-
-    public void ClickLogout(View view) {
-        //recreate activity
-       logout();
+    public void Clicklogout(View view)
+    {
+        logout();
     }
 
     public void logout() {
+        //recreate activity
         auth.signOut();
         finish();
 
@@ -354,6 +371,7 @@ public class display extends AppCompatActivity implements NavigationView.OnNavig
         startActivity(intent);
 
     }
+
 
        @Override
     protected void onPause() {

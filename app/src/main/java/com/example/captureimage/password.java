@@ -7,7 +7,9 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -34,7 +36,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.regex.Pattern;
 
-public class password extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class password extends AppCompatActivity {
 
     DrawerLayout drawerLayout;
     TextView text,show1,show2,show3,show4;
@@ -42,7 +44,6 @@ public class password extends AppCompatActivity implements NavigationView.OnNavi
     Button changepass;
     FirebaseAuth auth;
     FirebaseFirestore fStore;
-    String userID;
     StorageReference storageReference;
     ProgressDialog dialog;
     FirebaseUser user;
@@ -65,15 +66,12 @@ public class password extends AppCompatActivity implements NavigationView.OnNavi
         storageReference = FirebaseStorage.getInstance().getReference();
         auth = FirebaseAuth.getInstance();
         fStore = FirebaseFirestore.getInstance();
-        userID = auth.getCurrentUser().getUid();
-        user = auth.getCurrentUser();
         dialog = new ProgressDialog(this);
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Close);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
         //   getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        NavigationView navigationView = (NavigationView)findViewById(R.id.nv);
-        navigationView.setNavigationItemSelectedListener(this);
+
         newpass.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -218,25 +216,20 @@ public class password extends AppCompatActivity implements NavigationView.OnNavi
 
         }
     }
+    public void ClickImage(View view) {
+        //recreate activity
+        redirectActivity(password.this,MainActivity.class);
 
-
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.image) {
-            Intent intent = new Intent(password.this,MainActivity.class);
-            Toast.makeText(this, "Capture Image", Toast.LENGTH_SHORT).show();
-            startActivity(intent);
-        }
-        if (id == R.id.profile) {
-            Intent intent = new Intent(password.this,Profile.class);
-            Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
-            startActivity(intent);
-        }
-
-
-        return false;
     }
+    public void ChangePassword(View view){
+        //recreate activity
+        change();
 
+    }
+    public void Profile(View view) {
+        //recreate activity
+        redirectActivity(this, Profile.class);
+    }
     public static void redirectActivity(Activity activity, Class aClass) {
         //initialized intent
         Intent intent = new Intent(activity, aClass);
@@ -246,7 +239,51 @@ public class password extends AppCompatActivity implements NavigationView.OnNavi
         activity.startActivity(intent);
 
     }
-    public void ClickLogout(View view) {
+
+
+        private void change() {
+            AlertDialog.Builder builder = new AlertDialog.Builder(
+                    password.this);
+            builder.setTitle("Change Password");
+            builder.setMessage("If You have Login Via Google?");
+
+               /* builder.setNeutralButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,
+                                                int which) {
+                                Toast.makeText(getApplicationContext(), "Cancel is clicked", Toast.LENGTH_LONG).show();
+                            }
+                        });*/
+            builder.setNegativeButton("Yes",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,
+                                            int which) {
+                            Toast.makeText(getApplicationContext(), "Cant change Password for google login", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(password.this, password.class);
+                            startActivity(intent);
+                        }
+
+                    });
+            builder.setPositiveButton("No",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,
+                                            int which) {
+                            Intent intent = new Intent(password.this, password.class);
+                            startActivity(intent);
+                        }
+                    });
+
+
+            builder.show();
+
+        }
+
+
+    public void Clicklogout(View view)
+    {
+        logout();
+    }
+    public void Logout() {
         //recreate activity
         logout();
     }
