@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.UserHandle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -23,21 +24,25 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.jar.Attributes;
 
 public class Register extends AppCompatActivity {
 
     EditText email, password,name ;
     Button SignUp,login;
     String userID;
+    DatabaseReference reference;
     // Creating string to hold email and password .
     String EmailHolder, PasswordHolder,NameHolder ;
     ProgressDialog progressDialog;
-
+    FirebaseDatabase firebaseDatabase;
     // Creating FirebaseAuth object.
     FirebaseAuth firebaseAuth ;
     FirebaseFirestore firestore;
@@ -51,7 +56,7 @@ public class Register extends AppCompatActivity {
         name=(EditText)findViewById(R.id.edtname);
         email = (EditText)findViewById(R.id.edtemail);
         password = (EditText)findViewById(R.id.edtpass);
-
+        reference = FirebaseDatabase.getInstance().getReference().child("Members");
 // Assign button layout ID.
         SignUp = (Button)findViewById(R.id.login);
 
@@ -128,6 +133,7 @@ public class Register extends AppCompatActivity {
             }
         });
     }
+
 }
 
 
