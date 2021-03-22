@@ -6,13 +6,36 @@ android {
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
 
+
+    def versionPropsFile = file('version.properties')
+    def versionBuild
+    if (versionPropsFile.canRead()) {
+        def Properties versionProps = new Properties()
+        versionProps.load(new FileInputStream(versionPropsFile))
+        versionBuild = versionProps['VERSION_BUILD'].toInteger()
+    } else {
+        throw new FileNotFoundException("Could not read version.properties!")
+    }
+    ext.autoIncrementBuildNumber = {
+
+        if (versionPropsFile.canRead()) {
+            def Properties versionProps = new Properties()
+            versionProps.load(new FileInputStream(versionPropsFile))
+            versionBuild = versionProps['VERSION_BUILD'].toInteger() + 1
+            versionProps['VERSION_BUILD'] = versionBuild.toString()
+            versionProps.store(versionPropsFile.newWriter(), null)
+        } else {
+            throw new FileNotFoundException("Could not read version.properties!")
+        }
+    }
+
     defaultConfig {
         applicationId "com.example.captureimage"
         minSdkVersion 16
         multiDexEnabled true
         targetSdkVersion 30
         versionCode 1
-        versionName "1.0"
+        versionName "1.0." + versionBuild
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -26,7 +49,9 @@ android {
             variant ->
                 variant.outputs.each {
                     output ->
-                        def name = ("Image Capture " + variant.versionName + ".apk");
+
+                        def formattedDate = new Date().format('dd-MM-yyyy')
+                        def name = "${variant.versionName}_Image Capture__${formattedDate}.apk"
                         output.outputFileName = name
                 }
         }
@@ -34,6 +59,13 @@ android {
             pickFirst 'lib/x86/libc++_shared.so'
         }
 
+    }
+    gradle.taskGraph.whenReady {taskGraph ->
+        if (taskGraph.hasTask(assembleDebug)) { / when run debug task /
+            autoIncrementBuildNumber()
+        } else if (taskGraph.hasTask(assembleRelease)) { / when run release task /
+            autoIncrementBuildNumber()
+        }
     }
 }
 
@@ -57,7 +89,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     implementation 'com.google.firebase:firebase-core:16.0.5'
-    implementation 'com.google.firebase:firebase-ml-vision:18.0.1'
+    implementation 'com.google.firebase:firebase-ml-vision:.0.1'
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.github.bumptech.glide:glide:4.8.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
@@ -66,7 +98,6 @@ dependencies {
     implementation 'com.google.android.gms:play-services-vision:9.8.0'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
 
-    implementation 'com.android.support:design:28.1.1'
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.google.firebase:firebase-database:19.2.0'
     implementation 'com.google.firebase:firebase-analytics:17.2.1'

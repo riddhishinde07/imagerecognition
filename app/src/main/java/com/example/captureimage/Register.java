@@ -1,12 +1,8 @@
 package com.example.captureimage;
-
-
-
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.UserHandle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -24,25 +20,21 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.jar.Attributes;
 
 public class Register extends AppCompatActivity {
 
     EditText email, password,name ;
     Button SignUp,login;
     String userID;
-    DatabaseReference reference;
     // Creating string to hold email and password .
     String EmailHolder, PasswordHolder,NameHolder ;
     ProgressDialog progressDialog;
-    FirebaseDatabase firebaseDatabase;
+
     // Creating FirebaseAuth object.
     FirebaseAuth firebaseAuth ;
     FirebaseFirestore firestore;
@@ -50,19 +42,20 @@ public class Register extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register);
+        setContentView(R.layout.activity_main);
 
 // Assigning layout email ID and Password ID.
         name=(EditText)findViewById(R.id.edtname);
         email = (EditText)findViewById(R.id.edtemail);
         password = (EditText)findViewById(R.id.edtpass);
-      //  reference = FirebaseDatabase.getInstance().getReference().child("Members");
+
 // Assign button layout ID.
         SignUp = (Button)findViewById(R.id.login);
 
 // Creating object instance.
         firebaseAuth = FirebaseAuth.getInstance();
         firestore =FirebaseFirestore.getInstance();
+        progressDialog = new ProgressDialog(Register.this);
 
 // Adding click listener to Sign Up Button.
         SignUp.setOnClickListener(new View.OnClickListener() {
@@ -96,19 +89,6 @@ public class Register extends AppCompatActivity {
 
                                     Toast.makeText(Register.this, "Register Successfully", Toast.LENGTH_SHORT).show();
                                     startActivity(new Intent(getApplicationContext(), login.class));
-                                    userID = firebaseAuth.getCurrentUser().getUid();
-                                    DocumentReference documentReference = firestore.collection("users").document(userID);
-                                    Map<String,Object> user = new HashMap<>();
-                                    user.put("Name",NameHolder);
-                                    user.put("Email",EmailHolder);
-                                    documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Log.d(TAG,"Data is added"+userID);
-
-                                        }
-                                    });
-                                    startActivity(new Intent(getApplicationContext(), login.class));
                                 }
 
                                 else {
@@ -120,8 +100,8 @@ public class Register extends AppCompatActivity {
             }
         });
 
-       TextView login=findViewById(R.id.loginalready);
-        login.setOnClickListener(new View.OnClickListener() {
+        TextView already=findViewById(R.id.loginalready);
+        already.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -133,7 +113,4 @@ public class Register extends AppCompatActivity {
             }
         });
     }
-
 }
-
-

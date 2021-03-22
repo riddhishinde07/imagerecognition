@@ -289,6 +289,9 @@ public class password extends AppCompatActivity implements NavigationView.OnNavi
 
 
     public void logout() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
         auth.signOut();
         finish();
 

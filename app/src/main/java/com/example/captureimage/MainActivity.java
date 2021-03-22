@@ -272,6 +272,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void logout() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+//session.setLoggedin(true);
+
         mAuth.signOut();
         finish();
 

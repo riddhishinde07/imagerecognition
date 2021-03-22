@@ -360,6 +360,9 @@ public class display extends AppCompatActivity implements NavigationView.OnNavig
 
     public void logout() {
         //recreate activity
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
         auth.signOut();
         finish();
 

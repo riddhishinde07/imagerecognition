@@ -44,6 +44,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -60,7 +65,7 @@ import java.util.regex.Pattern;
 public class Profile extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     TextView name,name1,email1,email,text,change,only;
     FirebaseAuth auth;
-    FirebaseFirestore fStore;
+    FirebaseFirestore fStore = FirebaseFirestore.getInstance();
     FirebaseUser user;
     String userID,userID1;
     ImageView profile,profile1,add;
@@ -71,7 +76,8 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
     GoogleSignInClient mGoogleSignInClient;
     LinearLayout linearLayout;
     ActionBarDrawerToggle actionBarDrawerToggle;
-
+    DatabaseReference databaseReference;
+    FirebaseDatabase firebaseDatabase;
     SharedPreferences sharedPreferences;
     boolean getLoginStatus;
 
@@ -113,16 +119,14 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
         Glide.with(this)
                 .load(user.getPhotoUrl())
                 .into(profile);
-        name1.setText(user.getDisplayName());
-        email1.setText(user.getEmail());
+        name.setText(user.getDisplayName());
+        email.setText(user.getEmail());
+
 
 
 
         storageReference = FirebaseStorage.getInstance().getReference();
 
-
-
-        //   getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         auth = FirebaseAuth.getInstance();
         StorageReference profileRef = storageReference.child("users/" + auth.getCurrentUser().getUid() + "profile.jpg");
@@ -143,16 +147,6 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
         });
 
 
-       DocumentReference documentReference1 = fStore.collection("users").document(userID);
-        documentReference1.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-
-                name.setText(documentSnapshot.getString("Name"));
-                email.setText(documentSnapshot.getString("Email"));
-
-            }
-        });
 
     }
 
@@ -280,7 +274,9 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
         logout();
     }
     public  void logout(){
-
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
         auth.signOut();
         finish();
 

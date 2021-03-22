@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,9 +42,10 @@ public class login extends AppCompatActivity   {
     GoogleSignInClient mGoogleSignInClient;
     //code you will assign for starting the new activity.
     private static int RC_SIGN_IN = 1;
-    TextView email, password,forgot,signup;
+    TextView forgot,signup;
     Button sign_in;
     ImageView profile1;
+    EditText email, password;
     FirebaseAuth auth;
     DrawerLayout drawerLayout;
     GoogleSignInAccount googleSignInAccount;
@@ -63,8 +65,8 @@ public class login extends AppCompatActivity   {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         sign_in = (Button) findViewById(R.id.sign_in);
-        email = (TextView) findViewById(R.id.edtemail);
-        password = (TextView) findViewById(R.id.edtpassword);
+        email =  findViewById(R.id.edtemail);
+        password =  findViewById(R.id.edtpassword);
         profile1 = findViewById(R.id.profile1);
 
         //   final TextView change = findViewById(R.id.change);
@@ -169,6 +171,47 @@ public class login extends AppCompatActivity   {
                 });
             }
         });
+    }
+
+    private Boolean validateEmail() {
+        String val = email.getText().toString();
+        if (val.isEmpty()) {
+            email.setError("Field cannot be empty");
+            return false;
+        } else {
+            email.setError(null);
+
+
+            return true;
+        }
+    }
+    private Boolean validatePassword() {
+        String val = password.getText().toString();
+        if (val.isEmpty()) {
+            password.setError("Field cannot be empty");
+            return false;
+        } else {
+            password.setError(null);
+
+            return true;
+        }
+    }
+    public void loginUser(View view){
+        if(!validateEmail() | !validatePassword())
+        {
+            return;
+        }
+        else 
+        {
+           User();
+        }
+    }
+
+    private void User() {
+        String Email = email.getText().toString().trim();
+        String Password = password.getText().toString().trim();
+
+
     }
 
     private void signin() {
