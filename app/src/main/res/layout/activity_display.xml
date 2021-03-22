@@ -43,7 +43,7 @@
                 android:layout_marginEnd="33dp"
                 android:layout_marginRight="33dp"
                 android:layout_marginBottom="104dp"
-                android:hint="Paste the copied Text here!"
+                android:hint="Please paste the copied text here for translation!!"
                 android:textColor="#EB87F6"
                 android:textColorHint="#EB87F6" />
 

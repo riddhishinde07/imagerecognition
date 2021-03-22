@@ -57,7 +57,7 @@ import com.squareup.picasso.Picasso;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-public class Profile extends AppCompatActivity  {
+public class Profile extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     TextView name,name1,email1,email,text,change,only;
     FirebaseAuth auth;
     FirebaseFirestore fStore;
@@ -71,7 +71,12 @@ public class Profile extends AppCompatActivity  {
     GoogleSignInClient mGoogleSignInClient;
     LinearLayout linearLayout;
     ActionBarDrawerToggle actionBarDrawerToggle;
+
     SharedPreferences sharedPreferences;
+    boolean getLoginStatus;
+
+    private NavigationView nv;
+
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @SuppressLint({"SetTextI18n", "CheckResult", "CutPasteId"})
@@ -88,8 +93,20 @@ public class Profile extends AppCompatActivity  {
         email1 = findViewById(R.id.email1);
         auth = FirebaseAuth.getInstance();
         fStore = FirebaseFirestore.getInstance();
-        add = findViewById(R.id.addimg);
+        drawerLayout= findViewById(R.id.drawer_layout);
 
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Close);
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.syncState();
+        NavigationView navigationView = (NavigationView)findViewById(R.id.nv);
+         navigationView.setNavigationItemSelectedListener(this);
+        sharedPreferences = getSharedPreferences("googleLogin", Context.MODE_PRIVATE);
+        getLoginStatus = sharedPreferences.getBoolean("googleLogin", false);
+        if(getLoginStatus){
+            navigationView.getMenu().removeItem(R.id.changepassword);
+            profile1.setVisibility(View.INVISIBLE);
+
+        }
         userID = Objects.requireNonNull(auth.getCurrentUser()).getUid();
         user = auth.getCurrentUser();
        // userID1 = auth.getCurrentUser().getUid();
@@ -102,12 +119,9 @@ public class Profile extends AppCompatActivity  {
 
 
         storageReference = FirebaseStorage.getInstance().getReference();
-        profile1.setVisibility(View.INVISIBLE);
 
-        drawerLayout = findViewById(R.id.drawer_layout);
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Close);
-        drawerLayout.addDrawerListener(actionBarDrawerToggle);
-        actionBarDrawerToggle.syncState();
+
+
         //   getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         auth = FirebaseAuth.getInstance();
@@ -119,14 +133,7 @@ public class Profile extends AppCompatActivity  {
             }
         });
 
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                profile1.setVisibility(View.VISIBLE);
-                profile.setVisibility(View.INVISIBLE);
 
-            }
-        });
         profile1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -150,7 +157,7 @@ public class Profile extends AppCompatActivity  {
     }
 
 
-    private void change() {
+    /*private void change() {
         AlertDialog.Builder builder = new AlertDialog.Builder(
                 Profile.this);
         builder.setTitle("Change Password");
@@ -162,7 +169,7 @@ public class Profile extends AppCompatActivity  {
                                 Toast.makeText(getApplicationContext(), "Cancel is clicked", Toast.LENGTH_LONG).show();
                             }
                         });*/
-        builder.setNegativeButton("Yes",
+      /*  builder.setNegativeButton("Yes",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,
                                         int which) {
@@ -184,9 +191,29 @@ public class Profile extends AppCompatActivity  {
 
         builder.show();
 
+    }*/
+
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.image) {
+            Intent intent = new Intent(Profile.this, MainActivity.class);
+            Toast.makeText(this, "Capture Image", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+        }
+        if (id == R.id.profile) {
+            Intent intent = new Intent(Profile.this, Profile.class);
+            Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+        }
+        if (id == R.id.changepassword) {
+            Intent intent = new Intent(Profile.this, password.class);
+            Toast.makeText(this, "Change Password", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+        }
+
+
+        return false;
     }
-
-
 
     protected void onActivityResult(int requestCode,int resultCode, @androidx.annotation.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -274,7 +301,6 @@ public class Profile extends AppCompatActivity  {
 
     public void ChangePassword(View view){
         //recreate activity
-        change();
 
     }
 

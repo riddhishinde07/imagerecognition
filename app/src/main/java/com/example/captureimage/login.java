@@ -1,22 +1,16 @@
 package com.example.captureimage;
 
 import android.annotation.SuppressLint;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,26 +19,19 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.internal.NavigationMenu;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.protobuf.Api;
-
-import java.util.prefs.PreferenceChangeListener;
 
 
 public class login extends AppCompatActivity   {
@@ -63,7 +50,10 @@ public class login extends AppCompatActivity   {
     ActionBarDrawerToggle actionBarDrawerToggle;
     private ActionBarDrawerToggle t;
     private NavigationView nv;
-    Boolean IsLoggedIn;
+    Boolean IsLoggedIn = false;
+
+
+    SharedPreferences.Editor editor;
     SharedPreferences sharepreferences;
 
 
@@ -99,6 +89,10 @@ public class login extends AppCompatActivity   {
 
 
 
+
+
+
+
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         // interact with the Google Sign In API.
         Button signInButton = findViewById(R.id.sign_in_button);
@@ -108,9 +102,7 @@ public class login extends AppCompatActivity   {
             @Override
             public void onClick(View v) {
 
-                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-                startActivityForResult(signInIntent, RC_SIGN_IN);
-
+               signin();
 
             }
         });
@@ -141,7 +133,9 @@ public class login extends AppCompatActivity   {
                 // profile1.setVisibility(View.VISIBLE);
                 String Email = email.getText().toString().trim();
                 String Password = password.getText().toString().trim();
-                SharedPreferences preferences = getSharedPreferences("MYPREF",MODE_PRIVATE);
+               isLoggin = true;
+
+
 
                 if (TextUtils.isEmpty(Email)) {
                     email.setError("Email is Required.");
@@ -176,6 +170,20 @@ public class login extends AppCompatActivity   {
             }
         });
     }
+
+    private void signin() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("googleLogin", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("googleLogin", true);
+        editor.apply();
+    }
+
+
+
     protected  void  onStart() {
 
         super.onStart();
@@ -185,6 +193,14 @@ public class login extends AppCompatActivity   {
         }
 
     }
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.navigation_menu, menu);
+        return true;
+    }
+
+
+
+
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Task<GoogleSignInAccount> signInTask = GoogleSignIn.getSignedInAccountFromIntent(data);

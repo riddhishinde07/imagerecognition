@@ -9,8 +9,10 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
@@ -36,7 +38,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.regex.Pattern;
 
-public class password extends AppCompatActivity {
+public class password extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     DrawerLayout drawerLayout;
     TextView text,show1,show2,show3,show4;
@@ -46,6 +48,9 @@ public class password extends AppCompatActivity {
     FirebaseFirestore fStore;
     StorageReference storageReference;
     ProgressDialog dialog;
+    SharedPreferences sharedPreferences;
+    boolean getLoginStatus;
+
     FirebaseUser user;
     ActionBarDrawerToggle actionBarDrawerToggle;
     @Override
@@ -70,8 +75,15 @@ public class password extends AppCompatActivity {
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Close);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
-        //   getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+     //    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        NavigationView navigationView = (NavigationView)findViewById(R.id.nv);
+        navigationView.setNavigationItemSelectedListener(this);
+        sharedPreferences = getSharedPreferences("googleLogin", Context.MODE_PRIVATE);
+        getLoginStatus = sharedPreferences.getBoolean("googleLogin", false);
+        if(getLoginStatus){
+            navigationView.getMenu().removeItem(R.id.changepassword);
+        }
         newpass.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -191,6 +203,27 @@ public class password extends AppCompatActivity {
 
     }
 
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.image) {
+            Intent intent = new Intent(password.this, MainActivity.class);
+            Toast.makeText(this, "Capture Image", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+        }
+        if (id == R.id.profile) {
+            Intent intent = new Intent( password.this, Profile.class);
+            Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+        }
+        if (id == R.id.changepassword) {
+            Intent intent = new Intent(password.this, password.class);
+            Toast.makeText(this, "Change Password", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+        }
+
+
+        return false;
+    }
 
 
     public void ClickMenu(View view) {
@@ -223,7 +256,7 @@ public class password extends AppCompatActivity {
     }
     public void ChangePassword(View view){
         //recreate activity
-        change();
+
 
     }
     public void Profile(View view) {
@@ -241,42 +274,7 @@ public class password extends AppCompatActivity {
     }
 
 
-        private void change() {
-            AlertDialog.Builder builder = new AlertDialog.Builder(
-                    password.this);
-            builder.setTitle("Change Password");
-            builder.setMessage("Are You logged in Via Google?");
 
-               /* builder.setNeutralButton("Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,
-                                                int which) {
-                                Toast.makeText(getApplicationContext(), "Cancel is clicked", Toast.LENGTH_LONG).show();
-                            }
-                        });*/
-            builder.setNegativeButton("Yes",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog,
-                                            int which) {
-                            Toast.makeText(getApplicationContext(), "Cant change Password for google login", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(password.this, password.class);
-                            startActivity(intent);
-                        }
-
-                    });
-            builder.setPositiveButton("No",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog,
-                                            int which) {
-                            Intent intent = new Intent(password.this, password.class);
-                            startActivity(intent);
-                        }
-                    });
-
-
-            builder.show();
-
-        }
 
 
     public void Clicklogout(View view)

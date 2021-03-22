@@ -56,7 +56,7 @@ public class Register extends AppCompatActivity {
         name=(EditText)findViewById(R.id.edtname);
         email = (EditText)findViewById(R.id.edtemail);
         password = (EditText)findViewById(R.id.edtpass);
-        reference = FirebaseDatabase.getInstance().getReference().child("Members");
+      //  reference = FirebaseDatabase.getInstance().getReference().child("Members");
 // Assign button layout ID.
         SignUp = (Button)findViewById(R.id.login);
 

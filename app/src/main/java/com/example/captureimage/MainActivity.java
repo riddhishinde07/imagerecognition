@@ -57,7 +57,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "camera";
     FirebaseAuth mAuth;
     ImageView imageView;
@@ -70,10 +70,12 @@ public class MainActivity extends AppCompatActivity {
     static final int CAPTURE_IMAGE_REQUEST = 1;
     FileOutputStream outputStream;
     ActionBarDrawerToggle actionBarDrawerToggle;
-
+    private NavigationView nv;
     private static final String IMAGE_DIRECTORY_NAME = "Image";
     private long backPressedTime;
     private Toast backToast;
+    SharedPreferences sharedPreferences;
+    boolean getLoginStatus;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -85,9 +87,19 @@ public class MainActivity extends AppCompatActivity {
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Close);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
-     //   getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        NavigationView navigationView = (NavigationView)findViewById(R.id.nv);
+        navigationView.setNavigationItemSelectedListener(this);
 
+        sharedPreferences = getSharedPreferences("googleLogin", Context.MODE_PRIVATE);
+        getLoginStatus = sharedPreferences.getBoolean("googleLogin", false);
+        if(getLoginStatus){
+            navigationView.getMenu().removeItem(R.id.changepassword);
+        }
         mAuth = FirebaseAuth.getInstance();
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Close);
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.syncState();
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -207,6 +219,29 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.image) {
+            Intent intent = new Intent(MainActivity.this, MainActivity.class);
+            Toast.makeText(this, "Capture Image", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+        }
+        if (id == R.id.profile) {
+            Intent intent = new Intent(MainActivity.this, Profile.class);
+            Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+        }
+        if(!getLoginStatus) {
+            if (id == R.id.changepassword) {
+                Intent intent = new Intent(MainActivity.this, password.class);
+                Toast.makeText(this, "Change Password", Toast.LENGTH_SHORT).show();
+                startActivity(intent);
+            }
+        }
+
+        return false;
+    }
+
     public void ClickImage(View view) {
         //recreate activity
        recreate();
@@ -214,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void ChangePassword(View view){
         //recreate activity
-        change();
+
 
     }
     public void Profile(View view) {
@@ -249,7 +284,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private void change() {
+    /*private void change() {
         AlertDialog.Builder builder = new AlertDialog.Builder(
                 MainActivity.this);
         builder.setTitle("Change Password");
@@ -261,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(), "Cancel is clicked", Toast.LENGTH_LONG).show();
                             }
                         });*/
-        builder.setNegativeButton("Yes",
+  /*      builder.setNegativeButton("Yes",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,
                                         int which) {
@@ -283,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
 
         builder.show();
 
-    }
+    }*/
 
 }
 

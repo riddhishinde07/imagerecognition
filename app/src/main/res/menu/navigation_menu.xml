@@ -12,7 +12,6 @@
     <item android:id="@+id/changepassword"
         android:icon="@drawable/ic_clipart_pen_svg"
         android:textColor="#03A9F4"
-        android:onClick="change"
         android:title="Change Pawwsord"/>
 
 
