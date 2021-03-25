@@ -20,6 +20,10 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -34,6 +38,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.util.Arrays;
+
 
 public class login extends AppCompatActivity   {
     private static final String TAG = "";
@@ -43,7 +49,7 @@ public class login extends AppCompatActivity   {
     //code you will assign for starting the new activity.
     private static int RC_SIGN_IN = 1;
     TextView forgot,signup;
-    Button sign_in;
+    Button sign_in,sign_facebook,sign_twitter;
     ImageView profile1;
     EditText email, password;
     FirebaseAuth auth;
@@ -54,9 +60,7 @@ public class login extends AppCompatActivity   {
     private NavigationView nv;
     Boolean IsLoggedIn = false;
 
-
-    SharedPreferences.Editor editor;
-    SharedPreferences sharepreferences;
+    CallbackManager callbackManager;
 
 
 
@@ -68,7 +72,8 @@ public class login extends AppCompatActivity   {
         email =  findViewById(R.id.edtemail);
         password =  findViewById(R.id.edtpassword);
         profile1 = findViewById(R.id.profile1);
-
+        sign_facebook = findViewById(R.id.sign_in_facebook);
+        sign_twitter = findViewById(R.id.sign_in_twitter);
         //   final TextView change = findViewById(R.id.change);
         //creating object instance
 
@@ -127,7 +132,24 @@ public class login extends AppCompatActivity   {
             }
         });
 
+        sign_facebook.getInstance().registerCallBack(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
 
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+
+            }
+        }){
+
+        }
 
         sign_in.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -171,6 +193,13 @@ public class login extends AppCompatActivity   {
                 });
             }
         });
+    }
+
+    private void facebook() {
+        callbackManager = CallbackManager.Factory.create();
+        sign_facebook.setReadPermissions(Arrays.asList("EMAIL"));
+
+
     }
 
     private Boolean validateEmail() {

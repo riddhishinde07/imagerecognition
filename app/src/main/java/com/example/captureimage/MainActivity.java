@@ -64,8 +64,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     DrawerLayout drawerLayout;
     TextView textView;
     GoogleSignInClient googleSignInClient;
-    GoogleSignInOptions googleSignInOptions;
-    GoogleSignInAccount googleSignInAccount;
+
+
     File photoFile = null;
     static final int CAPTURE_IMAGE_REQUEST = 1;
     FileOutputStream outputStream;
@@ -90,6 +90,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         NavigationView navigationView = (NavigationView)findViewById(R.id.nv);
         navigationView.setNavigationItemSelectedListener(this);
+
+        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
 
         sharedPreferences = getSharedPreferences("googleLogin", Context.MODE_PRIVATE);
         getLoginStatus = sharedPreferences.getBoolean("googleLogin", false);
@@ -126,12 +129,43 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+              //  saveToGallery();
                 startActivityForResult(intent, 101);
 
 
             }
         });
 
+    }
+
+    private void saveToGallery() {
+        BitmapDrawable bitmapDrawable = (BitmapDrawable) imageView.getDrawable();
+        Bitmap bitmap = bitmapDrawable.getBitmap();
+
+        FileOutputStream outputStream = null;
+        File file = Environment.getExternalStorageDirectory();
+        File dir = new File(file.getAbsolutePath() + "/MyPics");
+        dir.mkdirs();
+
+        String filename = String.format("%d.jpg",System.currentTimeMillis());
+        File outFile = new File(dir,filename);
+        try{
+            outputStream = new FileOutputStream(outFile);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        bitmap.compress(Bitmap.CompressFormat.JPEG,100,outputStream);
+        try{
+            outputStream.flush();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        try{
+            outputStream.close();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 
