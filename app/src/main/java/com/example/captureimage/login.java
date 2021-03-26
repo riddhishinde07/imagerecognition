@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +16,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,7 +27,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -35,9 +41,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 
 
@@ -60,7 +69,7 @@ public class login extends AppCompatActivity   {
     private NavigationView nv;
     Boolean IsLoggedIn = false;
 
-    CallbackManager callbackManager;
+    CallbackManager mCallbackManager;
 
 
 
@@ -72,10 +81,22 @@ public class login extends AppCompatActivity   {
         email =  findViewById(R.id.edtemail);
         password =  findViewById(R.id.edtpassword);
         profile1 = findViewById(R.id.profile1);
-        sign_facebook = findViewById(R.id.sign_in_facebook);
-        sign_twitter = findViewById(R.id.sign_in_twitter);
+
+
         //   final TextView change = findViewById(R.id.change);
         //creating object instance
+        FacebookSdk.sdkInitialize(login.this);
+
+        // Initialize Facebook Login button
+        mCallbackManager = CallbackManager.Factory.create();
+        sign_facebook= findViewById(R.id.login_facbook);
+        sign_facebook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               facelogin();
+            }
+        });
+
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -132,24 +153,7 @@ public class login extends AppCompatActivity   {
             }
         });
 
-        sign_facebook.getInstance().registerCallBack(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
 
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-
-            }
-        }){
-
-        }
 
         sign_in.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -195,12 +199,36 @@ public class login extends AppCompatActivity   {
         });
     }
 
-    private void facebook() {
-        callbackManager = CallbackManager.Factory.create();
-        sign_facebook.setReadPermissions(Arrays.asList("EMAIL"));
-
-
+    private void handleFacebookAccessToken(AccessToken token) {
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            updateUI(user);
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Toast.makeText(login.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                            updateUI(null);
+                        }
+                    }
+                });
     }
+
+    private void updateUI(FirebaseUser user) {
+        if(user != null)
+        {
+                Intent intent = new Intent(login.this,MainActivity.class);
+                startActivity(intent);
+        }else{
+                Toast.makeText(this,"Please login to continue",Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
     private Boolean validateEmail() {
         String val = email.getText().toString();
@@ -254,6 +282,29 @@ public class login extends AppCompatActivity   {
         editor.apply();
     }
 
+    private  void facelogin(){
+        LoginManager.getInstance().logInWithReadPermissions(login.this, Arrays.asList("email", "public_profile"));
+        LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+
+                handleFacebookAccessToken(loginResult.getAccessToken());
+            }
+
+            @Override
+            public void onCancel() {
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+            }
+        });
+        SharedPreferences sharedPreferences1 = getSharedPreferences("facebookLogin", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences1.edit();
+        editor.putBoolean("facebookLogin", true);
+        editor.apply();
+    }
+
 
 
     protected  void  onStart() {
@@ -274,6 +325,7 @@ public class login extends AppCompatActivity   {
 
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mCallbackManager.onActivityResult(requestCode,resultCode,data);
         super.onActivityResult(requestCode, resultCode, data);
         Task<GoogleSignInAccount> signInTask = GoogleSignIn.getSignedInAccountFromIntent(data);
         try {
