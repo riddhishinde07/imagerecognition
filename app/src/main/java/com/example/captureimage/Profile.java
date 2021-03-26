@@ -78,7 +78,7 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
     ActionBarDrawerToggle actionBarDrawerToggle;
     DatabaseReference databaseReference;
     FirebaseDatabase firebaseDatabase;
-    SharedPreferences sharedPreferences;
+    SharedPreferences sharedPreferences,sharedPreferences1;
     boolean getLoginStatus;
 
     private NavigationView nv;
@@ -113,6 +113,13 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
             profile1.setVisibility(View.INVISIBLE);
 
         }
+        sharedPreferences1 = getSharedPreferences("facebookLogin", Context.MODE_PRIVATE);
+        getLoginStatus = sharedPreferences1.getBoolean("facebookLogin", false);
+        if(getLoginStatus){
+            navigationView.getMenu().removeItem(R.id.changepassword);
+            profile1.setVisibility(View.INVISIBLE);
+        }
+
         userID = Objects.requireNonNull(auth.getCurrentUser()).getUid();
         user = auth.getCurrentUser();
        // userID1 = auth.getCurrentUser().getUid();

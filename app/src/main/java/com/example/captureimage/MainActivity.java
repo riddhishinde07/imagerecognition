@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String IMAGE_DIRECTORY_NAME = "Image";
     private long backPressedTime;
     private Toast backToast;
-    SharedPreferences sharedPreferences;
+    SharedPreferences sharedPreferences,sharedPreferences1;
     boolean getLoginStatus;
 
 
@@ -99,6 +99,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(getLoginStatus){
             navigationView.getMenu().removeItem(R.id.changepassword);
         }
+        sharedPreferences1 = getSharedPreferences("facebookLogin", Context.MODE_PRIVATE);
+        getLoginStatus = sharedPreferences1.getBoolean("facebookLogin", false);
+        if(getLoginStatus){
+            navigationView.getMenu().removeItem(R.id.changepassword);
+        }
+
+
         mAuth = FirebaseAuth.getInstance();
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Close);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);

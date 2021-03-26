@@ -71,7 +71,7 @@ public class display extends AppCompatActivity implements NavigationView.OnNavig
     StorageReference storageReference;
     ImageView profileimg;
     FirebaseUser user;
-    SharedPreferences sharedPreferences;
+    SharedPreferences sharedPreferences,sharedPreferences1;
     boolean getLoginStatus;
 
     FirebaseTranslator firebaseTranslator;
@@ -104,6 +104,14 @@ public class display extends AppCompatActivity implements NavigationView.OnNavig
         if(getLoginStatus){
             navigationView.getMenu().removeItem(R.id.changepassword);
         }
+
+        sharedPreferences1 = getSharedPreferences("facebookLogin", Context.MODE_PRIVATE);
+        getLoginStatus = sharedPreferences1.getBoolean("facebookLogin", false);
+        if(getLoginStatus){
+            navigationView.getMenu().removeItem(R.id.changepassword);
+        }
+
+
         user = auth.getCurrentUser();
         dpart = findViewById(R.id.dpart);
          number = findViewById(R.id.number);
