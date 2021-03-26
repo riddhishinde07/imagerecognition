@@ -58,7 +58,7 @@ public class login extends AppCompatActivity   {
     //code you will assign for starting the new activity.
     private static int RC_SIGN_IN = 1;
     TextView forgot,signup;
-    Button sign_in,sign_facebook,sign_twitter;
+    Button sign_in,sign_facebook;
     ImageView profile1;
     EditText email, password;
     FirebaseAuth auth;
@@ -253,23 +253,7 @@ public class login extends AppCompatActivity   {
             return true;
         }
     }
-    public void loginUser(View view){
-        if(!validateEmail() | !validatePassword())
-        {
-            return;
-        }
-        else 
-        {
-           User();
-        }
-    }
 
-    private void User() {
-        String Email = email.getText().toString().trim();
-        String Password = password.getText().toString().trim();
-
-
-    }
 
     private void signin() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
