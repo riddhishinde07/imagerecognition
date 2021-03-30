@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private long backPressedTime;
     private Toast backToast;
     SharedPreferences sharedPreferences,sharedPreferences1;
-    boolean getLoginStatus;
+    boolean getLoginStatus,getLoginStatus1;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
