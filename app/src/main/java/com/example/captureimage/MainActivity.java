@@ -11,6 +11,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     File photoFile = null;
-    static final int CAPTURE_IMAGE_REQUEST = 1;
+    static final int CAPTURE_IMAGE_REQUEST = 1,SELECT_FILE=0;
     FileOutputStream outputStream;
     ActionBarDrawerToggle actionBarDrawerToggle;
     private NavigationView nv;
@@ -135,9 +136,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-              //  saveToGallery();
-                startActivityForResult(intent, 101);
+                SelectImg();
 
 
             }
@@ -145,6 +144,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    private void SelectImg(){
+       final CharSequence[] items = {"Camera","Gallery","Cancel"};
+       AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+       builder.setTitle("Add Image");
+       builder.setItems(items, new DialogInterface.OnClickListener() {
+           @Override
+           public void onClick(DialogInterface dialog, int i) {
+               if(items[i].equals("Camera")){
+
+                   Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                   startActivityForResult(intent, CAPTURE_IMAGE_REQUEST);
+
+               }else if(items[i].equals("Gallery")){
+
+                   Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                   intent.setType("image/*");
+                   startActivityForResult(intent.createChooser(intent,"Select File"), SELECT_FILE);
+
+               }else if(items[i].equals("Cancel")){
+                   dialog.dismiss();
+               }
+           }
+       });
+       builder.show();
+
+    }
     private void saveToGallery() {
         BitmapDrawable bitmapDrawable = (BitmapDrawable) imageView.getDrawable();
         Bitmap bitmap = bitmapDrawable.getBitmap();
@@ -181,41 +206,90 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         assert data != null;
-        Bundle bundle = data.getExtras();
+        if(resultCode == Activity.RESULT_OK){
+
+            if(requestCode==CAPTURE_IMAGE_REQUEST){
+                Bundle bundle = data.getExtras();
 //from bundle, extract the image
-        Bitmap bitmap = (Bitmap) bundle.get("data");
+                Bitmap bitmap = (Bitmap) bundle.get("data");
 //set image in imageview
-        imageView.setImageBitmap(bitmap);
-//process the image
-//1. create a FirebaseVisionImage object from a Bitmap object
-        FirebaseVisionImage firebaseVisionImage = FirebaseVisionImage.fromBitmap(bitmap);
+                imageView.setImageBitmap(bitmap);
+                FirebaseVisionImage firebaseVisionImage = FirebaseVisionImage.fromBitmap(bitmap);
 //2. Get an instance of FirebaseVision
-        FirebaseVision firebaseVision = FirebaseVision.getInstance();
+                FirebaseVision firebaseVision = FirebaseVision.getInstance();
 //3. Create an instance of FirebaseVisionTextRecognizer
-        FirebaseVisionTextRecognizer firebaseVisionTextRecognizer = firebaseVision.getOnDeviceTextRecognizer();
+                FirebaseVisionTextRecognizer firebaseVisionTextRecognizer = firebaseVision.getOnDeviceTextRecognizer();
 //4. Create a task to process the image
-        Task<FirebaseVisionText> task = firebaseVisionTextRecognizer.processImage(firebaseVisionImage);
+                Task<FirebaseVisionText> task = firebaseVisionTextRecognizer.processImage(firebaseVisionImage);
 //5. if task is success
-        task.addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
-            @Override
-            public void onSuccess(FirebaseVisionText firebaseVisionText) {
+                task.addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
+                    @Override
+                    public void onSuccess(FirebaseVisionText firebaseVisionText) {
 
-                String s = firebaseVisionText.getText();
-                Intent intent = new Intent(MainActivity.this, display.class);
-                intent.putExtra("", s);
-                startActivity(intent);
+                        String s = firebaseVisionText.getText();
+                        saveToGallery();
+                        Intent intent = new Intent(MainActivity.this, display.class);
+                        intent.putExtra("", s);
+                        startActivity(intent);
 
 
-            }
-        });
+                    }
+                });
 
 //6. if task is failure
-        task.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                task.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+
+            }else if(requestCode==SELECT_FILE){
+                Uri selectimg = data.getData();
+                imageView.setImageURI(selectimg);
+
+                try {
+                    FirebaseVisionImage firebaseVisionImage = FirebaseVisionImage.fromFilePath(this,selectimg);
+                    FirebaseVision firebaseVision = FirebaseVision.getInstance();
+//3. Create an instance of FirebaseVisionTextRecognizer
+                    FirebaseVisionTextRecognizer firebaseVisionTextRecognizer = firebaseVision.getOnDeviceTextRecognizer();
+//4. Create a task to process the image
+                    Task<FirebaseVisionText> task = firebaseVisionTextRecognizer.processImage(firebaseVisionImage);
+//5. if task is success
+                    task.addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
+                        @Override
+                        public void onSuccess(FirebaseVisionText firebaseVisionText) {
+
+                            String s = firebaseVisionText.getText();
+                            Intent intent = new Intent(MainActivity.this, display.class);
+                            intent.putExtra("", s);
+                            startActivity(intent);
+
+
+                        }
+                    });
+
+//6. if task is failure
+                    task.addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             }
-        });
+        }
+      //  Bundle bundle = data.getExtras();
+//from bundle, extract the image
+        //Bitmap bitmap = (Bitmap) bundle.get("data");
+//set image in imageview
+        //imageView.setImageBitmap(bitmap);
+//process the image
+//1. create a FirebaseVisionImage object from a Bitmap object
+
     }
 
     @Override
