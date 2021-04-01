@@ -13,6 +13,11 @@
         android:icon="@drawable/ic_clipart_pen_svg"
         android:textColor="#03A9F4"
         android:title="Change Pawwsord"/>
+    <item android:id="@+id/translate"
+        android:textColor="#03A9F4"
+        android:icon="@drawable/ic_trans"
+        android:title="Translation"/>
+
 
 
 

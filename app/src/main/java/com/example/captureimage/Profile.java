@@ -127,6 +127,7 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
                 .load(user.getPhotoUrl())
                 .into(profile);
         name.setText(user.getDisplayName());
+
         email.setText(user.getEmail());
 
 
@@ -209,6 +210,11 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
         if (id == R.id.changepassword) {
             Intent intent = new Intent(Profile.this, password.class);
             Toast.makeText(this, "Change Password", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+        }
+        if (id == R.id.translate) {
+            Intent intent = new Intent(Profile.this,translate.class);
+            Toast.makeText(this, "Translation", Toast.LENGTH_SHORT).show();
             startActivity(intent);
         }
 

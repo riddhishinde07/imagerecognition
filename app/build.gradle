@@ -103,6 +103,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics:17.2.1'
     implementation 'com.google.firebase:firebase-ml-natural-language:16.0.1'
     implementation 'com.google.firebase:firebase-ml-natural-language-translate-model:18.0.1'
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.7.+'
 
 
 }

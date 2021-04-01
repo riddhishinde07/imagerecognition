@@ -14,6 +14,7 @@ import android.Manifest;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,6 +29,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -43,12 +45,17 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.text.TextBlock;
+import com.google.android.gms.vision.text.TextRecognizer;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -76,6 +83,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private long backPressedTime;
     private Toast backToast;
     SharedPreferences sharedPreferences,sharedPreferences1;
+    final int CROP_PIC = 2;
+    private Uri picUri;
     boolean getLoginStatus,getLoginStatus1;
 
 
@@ -137,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View v) {
                 SelectImg();
+                performCrop();
 
 
             }
@@ -156,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                    startActivityForResult(intent, CAPTURE_IMAGE_REQUEST);
 
+
                }else if(items[i].equals("Gallery")){
 
                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -169,6 +180,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
        });
        builder.show();
 
+    }
+    private void performCrop() {
+        // take care of exceptions
+        try {
+            // call the standard crop action intent (the user device may not
+            // support it)
+            Intent cropIntent = new Intent("com.android.camera.action.CROP");
+            // indicate image type and Uri
+            cropIntent.setDataAndType(picUri, "image/*");
+            // set crop properties
+            cropIntent.putExtra("crop", "true");
+            // indicate aspect of desired crop
+            cropIntent.putExtra("aspectX", 2);
+            cropIntent.putExtra("aspectY", 1);
+            // indicate output X and Y
+            cropIntent.putExtra("outputX", 256);
+            cropIntent.putExtra("outputY", 256);
+            // retrieve data on return
+            cropIntent.putExtra("return-data", true);
+            // start the activity - we handle returning in onActivityResult
+            startActivityForResult(cropIntent, CROP_PIC);
+        }
+        // respond to users whose devices do not support the crop action
+        catch (ActivityNotFoundException anfe) {
+            Toast toast = Toast
+                    .makeText(this, "This device doesn't support the crop action!", Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
     private void saveToGallery() {
         BitmapDrawable bitmapDrawable = (BitmapDrawable) imageView.getDrawable();
@@ -205,10 +244,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        assert data != null;
         if(resultCode == Activity.RESULT_OK){
 
             if(requestCode==CAPTURE_IMAGE_REQUEST){
+           //     CropImage.activity(picUri).setGuidelines(CropImageView.Guidelines.ON).start(this);
+                picUri = data.getData();
+
                 Bundle bundle = data.getExtras();
 //from bundle, extract the image
                 Bitmap bitmap = (Bitmap) bundle.get("data");
@@ -244,18 +285,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 });
 
-            }else if(requestCode==SELECT_FILE){
+
+            }if(requestCode==SELECT_FILE) {
+            //    CropImage.activity(data.getData()).setGuidelines(CropImageView.Guidelines.ON).start(this);
                 Uri selectimg = data.getData();
                 imageView.setImageURI(selectimg);
 
                 try {
                     FirebaseVisionImage firebaseVisionImage = FirebaseVisionImage.fromFilePath(this,selectimg);
                     FirebaseVision firebaseVision = FirebaseVision.getInstance();
-//3. Create an instance of FirebaseVisionTextRecognizer
                     FirebaseVisionTextRecognizer firebaseVisionTextRecognizer = firebaseVision.getOnDeviceTextRecognizer();
-//4. Create a task to process the image
                     Task<FirebaseVisionText> task = firebaseVisionTextRecognizer.processImage(firebaseVisionImage);
-//5. if task is success
                     task.addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
                         @Override
                         public void onSuccess(FirebaseVisionText firebaseVisionText) {
@@ -269,7 +309,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                     });
 
-//6. if task is failure
                     task.addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
@@ -281,16 +320,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
 
             }
-        }
-      //  Bundle bundle = data.getExtras();
-//from bundle, extract the image
-        //Bitmap bitmap = (Bitmap) bundle.get("data");
-//set image in imageview
-        //imageView.setImageBitmap(bitmap);
-//process the image
-//1. create a FirebaseVisionImage object from a Bitmap object
 
-    }
+            }
+        }
+
+
 
     @Override
     public void onBackPressed() {
@@ -352,6 +386,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(this, "Change Password", Toast.LENGTH_SHORT).show();
                 startActivity(intent);
             }
+        }
+        if (id == R.id.translate) {
+            Intent intent = new Intent(MainActivity.this,translate.class);
+            Toast.makeText(this, "Translation", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
         }
 
         return false;
