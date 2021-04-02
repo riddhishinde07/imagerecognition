@@ -48,8 +48,8 @@ public class password extends AppCompatActivity implements NavigationView.OnNavi
     FirebaseFirestore fStore;
     StorageReference storageReference;
     ProgressDialog dialog;
-    SharedPreferences sharedPreferences;
-    boolean getLoginStatus;
+    SharedPreferences sharedPreferences,  sharedPreferences1;
+    boolean getLoginStatus,isGetLoginStatus;
 
     FirebaseUser user;
     ActionBarDrawerToggle actionBarDrawerToggle;
@@ -81,9 +81,15 @@ public class password extends AppCompatActivity implements NavigationView.OnNavi
         navigationView.setNavigationItemSelectedListener(this);
         sharedPreferences = getSharedPreferences("googleLogin", Context.MODE_PRIVATE);
         getLoginStatus = sharedPreferences.getBoolean("googleLogin", false);
-        if(getLoginStatus){
+   //     if(getLoginStatus){
+     //       navigationView.getMenu().removeItem(R.id.changepassword);
+       // }
+        sharedPreferences1 = getSharedPreferences("facebookLogin", Context.MODE_PRIVATE);
+        getLoginStatus = sharedPreferences1.getBoolean("facebookLogin", false);
+        if (getLoginStatus || isGetLoginStatus){
             navigationView.getMenu().removeItem(R.id.changepassword);
         }
+
         newpass.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

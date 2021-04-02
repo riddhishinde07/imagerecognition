@@ -222,6 +222,10 @@ public class login extends AppCompatActivity   {
     private void updateUI(FirebaseUser user) {
         if(user != null)
         {
+            SharedPreferences sharedPreferences1 = getSharedPreferences("facebookLogin", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences1.edit();
+            editor.putBoolean("facebookLogin", true);
+            editor.apply();
                 Intent intent = new Intent(login.this,MainActivity.class);
                 startActivity(intent);
         }else{
@@ -283,10 +287,7 @@ public class login extends AppCompatActivity   {
             public void onError(FacebookException error) {
             }
         });
-        SharedPreferences sharedPreferences1 = getSharedPreferences("facebookLogin", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences1.edit();
-        editor.putBoolean("facebookLogin", true);
-        editor.apply();
+
     }
 
 

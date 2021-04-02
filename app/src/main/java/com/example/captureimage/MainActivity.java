@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     SharedPreferences sharedPreferences,sharedPreferences1;
     final int CROP_PIC = 2;
     private Uri picUri;
-    boolean getLoginStatus,getLoginStatus1;
+    boolean getLoginStatus,isGetLoginStatus;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -106,12 +106,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         sharedPreferences = getSharedPreferences("googleLogin", Context.MODE_PRIVATE);
         getLoginStatus = sharedPreferences.getBoolean("googleLogin", false);
-        if(getLoginStatus){
-            navigationView.getMenu().removeItem(R.id.changepassword);
-        }
+     //   if(getLoginStatus){
+       //     navigationView.getMenu().removeItem(R.id.changepassword);
+        //}
         sharedPreferences1 = getSharedPreferences("facebookLogin", Context.MODE_PRIVATE);
         getLoginStatus = sharedPreferences1.getBoolean("facebookLogin", false);
-        if(getLoginStatus){
+        if (getLoginStatus || isGetLoginStatus) {
             navigationView.getMenu().removeItem(R.id.changepassword);
         }
 
@@ -380,7 +380,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
             startActivity(intent);
         }
-        if(!getLoginStatus) {
+        if(!getLoginStatus || isGetLoginStatus) {
             if (id == R.id.changepassword) {
                 Intent intent = new Intent(MainActivity.this, password.class);
                 Toast.makeText(this, "Change Password", Toast.LENGTH_SHORT).show();

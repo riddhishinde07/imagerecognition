@@ -79,7 +79,7 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
     DatabaseReference databaseReference;
     FirebaseDatabase firebaseDatabase;
     SharedPreferences sharedPreferences,sharedPreferences1;
-    boolean getLoginStatus;
+    boolean getLoginStatus,isGetLoginStatus;
 
     private NavigationView nv;
 
@@ -108,14 +108,14 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
          navigationView.setNavigationItemSelectedListener(this);
         sharedPreferences = getSharedPreferences("googleLogin", Context.MODE_PRIVATE);
         getLoginStatus = sharedPreferences.getBoolean("googleLogin", false);
-        if(getLoginStatus){
-            navigationView.getMenu().removeItem(R.id.changepassword);
-            profile1.setVisibility(View.INVISIBLE);
+      //  if(getLoginStatus){
+        //    navigationView.getMenu().removeItem(R.id.changepassword);
+          //  profile1.setVisibility(View.INVISIBLE);
 
-        }
+        //}
         sharedPreferences1 = getSharedPreferences("facebookLogin", Context.MODE_PRIVATE);
         getLoginStatus = sharedPreferences1.getBoolean("facebookLogin", false);
-        if(getLoginStatus){
+        if (getLoginStatus || isGetLoginStatus){
             navigationView.getMenu().removeItem(R.id.changepassword);
             profile1.setVisibility(View.INVISIBLE);
         }

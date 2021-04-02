@@ -72,7 +72,7 @@ public class display extends AppCompatActivity implements NavigationView.OnNavig
     ImageView profileimg;
     FirebaseUser user;
     SharedPreferences sharedPreferences,sharedPreferences1;
-    boolean getLoginStatus;
+    boolean getLoginStatus,isGetLoginStatus;
 
     FirebaseTranslator firebaseTranslator;
    Spinner spinner;
@@ -101,13 +101,13 @@ public class display extends AppCompatActivity implements NavigationView.OnNavig
         navigationView.setNavigationItemSelectedListener(this);
         sharedPreferences = getSharedPreferences("googleLogin", Context.MODE_PRIVATE);
         getLoginStatus = sharedPreferences.getBoolean("googleLogin", false);
-        if(getLoginStatus){
-            navigationView.getMenu().removeItem(R.id.changepassword);
-        }
+   //     if(getLoginStatus){
+     //       navigationView.getMenu().removeItem(R.id.changepassword);
+       // }
 
         sharedPreferences1 = getSharedPreferences("facebookLogin", Context.MODE_PRIVATE);
         getLoginStatus = sharedPreferences1.getBoolean("facebookLogin", false);
-        if(getLoginStatus){
+        if (getLoginStatus || isGetLoginStatus){
             navigationView.getMenu().removeItem(R.id.changepassword);
         }
 
