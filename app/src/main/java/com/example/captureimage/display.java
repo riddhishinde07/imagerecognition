@@ -66,8 +66,6 @@ public class display extends AppCompatActivity implements NavigationView.OnNavig
     EditText dpart,number;
     FirebaseAuth auth;
     FirebaseFirestore fStore;
-    String userID;
-    Button changelanguage;
     StorageReference storageReference;
     ImageView profileimg;
     FirebaseUser user;
@@ -106,7 +104,7 @@ public class display extends AppCompatActivity implements NavigationView.OnNavig
        // }
 
         sharedPreferences1 = getSharedPreferences("facebookLogin", Context.MODE_PRIVATE);
-        getLoginStatus = sharedPreferences1.getBoolean("facebookLogin", false);
+        isGetLoginStatus = sharedPreferences1.getBoolean("facebookLogin", false);
         if (getLoginStatus || isGetLoginStatus){
             navigationView.getMenu().removeItem(R.id.changepassword);
         }
@@ -341,31 +339,7 @@ public class display extends AppCompatActivity implements NavigationView.OnNavig
     }
 
 
-    public void ClickImage(View view) {
-        //recreate activity
-        redirectActivity(this, MainActivity.class);
 
-    }
-    public void ChangePassword(View view){
-        //recreate activity
-
-
-    }
-    public void Profile(View view) {
-        //recreate activity
-        redirectActivity(this, Profile.class);
-    }
-
-
-    public static void redirectActivity(Activity activity, Class aClass) {
-        //initialized intent
-        Intent intent = new Intent(activity, aClass);
-        //set flag
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        //start activity
-        activity.startActivity(intent);
-
-    }
     public void Clicklogout(View view)
     {
         logout();
@@ -376,8 +350,12 @@ public class display extends AppCompatActivity implements NavigationView.OnNavig
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
-        auth.signOut();
+
+        SharedPreferences.Editor editor2 = sharedPreferences1.edit();
+        editor2.clear();
+        editor2.apply();
         finish();
+        auth.signOut();
 
         Intent intent = new Intent(display.this, login.class);
         Toast.makeText(display.this, "Logged Out Successfully.", Toast.LENGTH_LONG).show();

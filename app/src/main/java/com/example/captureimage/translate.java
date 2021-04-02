@@ -84,7 +84,7 @@ public class translate extends AppCompatActivity  implements NavigationView.OnNa
         //}
 
         sharedPreferences1 = getSharedPreferences("facebookLogin", Context.MODE_PRIVATE);
-        getLoginStatus = sharedPreferences1.getBoolean("facebookLogin", false);
+        isGetLoginStatus = sharedPreferences1.getBoolean("facebookLogin", false);
         if (getLoginStatus || isGetLoginStatus){
             navigationView.getMenu().removeItem(R.id.changepassword);
         }
@@ -293,8 +293,12 @@ public class translate extends AppCompatActivity  implements NavigationView.OnNa
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
-        auth.signOut();
+
+        SharedPreferences.Editor editor2 = sharedPreferences1.edit();
+        editor2.clear();
+        editor2.apply();
         finish();
+        auth.signOut();
 
         Intent intent = new Intent(translate.this, login.class);
         Toast.makeText(translate.this, "Logged Out Successfully.", Toast.LENGTH_LONG).show();

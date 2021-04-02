@@ -99,27 +99,10 @@ public class login extends AppCompatActivity   {
 
 
         mAuth = FirebaseAuth.getInstance();
-
-        //   getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //    NavigationView navigationView = (NavigationView)findViewById(R.id.nv);
-        //  navigationView.setNavigationItemSelectedListener(this);
-        //Use to configure sign in api
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("247322205294-i9qn10pree5fjfupldkkd8m3jqm49gfu.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
-
-    /*   GoogleSignInAccount signInAccount =  GoogleSignIn.getLastSignedInAccount(this);
-        if(signInAccount != null){
-            startActivity(new Intent(this,MainActivity.class));
-        }*/
-
-
-
-
-
-
-
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         // interact with the Google Sign In API.
@@ -161,7 +144,7 @@ public class login extends AppCompatActivity   {
                 // profile1.setVisibility(View.VISIBLE);
                 String Email = email.getText().toString().trim();
                 String Password = password.getText().toString().trim();
-               isLoggin = true;
+               //isLoggin = true;
 
 
 
@@ -184,6 +167,7 @@ public class login extends AppCompatActivity   {
 
                             Toast.makeText(login.this, "Logged in Successfully", Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(getApplicationContext(), MainActivity.class));
+
 
 
                         } else {
@@ -228,46 +212,26 @@ public class login extends AppCompatActivity   {
             editor.apply();
                 Intent intent = new Intent(login.this,MainActivity.class);
                 startActivity(intent);
+                finish();
         }else{
                 Toast.makeText(this,"Please login to continue",Toast.LENGTH_SHORT).show();
         }
     }
 
 
-    private Boolean validateEmail() {
-        String val = email.getText().toString();
-        if (val.isEmpty()) {
-            email.setError("Field cannot be empty");
-            return false;
-        } else {
-            email.setError(null);
-
-
-            return true;
-        }
-    }
-    private Boolean validatePassword() {
-        String val = password.getText().toString();
-        if (val.isEmpty()) {
-            password.setError("Field cannot be empty");
-            return false;
-        } else {
-            password.setError(null);
-
-            return true;
-        }
-    }
 
 
     private void signin() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-
-        startActivityForResult(signInIntent, RC_SIGN_IN);
 
         SharedPreferences sharedPreferences = getSharedPreferences("googleLogin", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("googleLogin", true);
         editor.apply();
+
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+
     }
 
     private  void facelogin(){
@@ -312,36 +276,35 @@ public class login extends AppCompatActivity   {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         mCallbackManager.onActivityResult(requestCode,resultCode,data);
         super.onActivityResult(requestCode, resultCode, data);
-        Task<GoogleSignInAccount> signInTask = GoogleSignIn.getSignedInAccountFromIntent(data);
-        try {
-            GoogleSignInAccount signInAcc = signInTask.getResult(ApiException.class);
-            AuthCredential authCredential = GoogleAuthProvider.getCredential(signInAcc.getIdToken(),null);
-            mAuth.signInWithCredential(authCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    Toast.makeText(getApplicationContext(), "Logged in Successfully", Toast.LENGTH_SHORT).show();
+        if(requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> signInTask = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                GoogleSignInAccount signInAcc = signInTask.getResult(ApiException.class);
+                AuthCredential authCredential = GoogleAuthProvider.getCredential(signInAcc.getIdToken(), null);
+                mAuth.signInWithCredential(authCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        Toast.makeText(getApplicationContext(), "Logged in Successfully", Toast.LENGTH_SHORT).show();
 
-                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
 
 
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
 
-                }
-            });
+                    }
+                });
 
-        } catch (ApiException e) {
-            e.printStackTrace();
+            } catch (ApiException e) {
+                e.printStackTrace();
+            }
         }
 
     }
 
-    private void redirectToHome() {
-        startActivity(new Intent(login.this, MainActivity.class));
-        finish();
-    }
+
     protected void onResume() {
         super.onResume();
     }

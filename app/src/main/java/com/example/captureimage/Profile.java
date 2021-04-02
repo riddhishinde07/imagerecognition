@@ -114,7 +114,7 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
 
         //}
         sharedPreferences1 = getSharedPreferences("facebookLogin", Context.MODE_PRIVATE);
-        getLoginStatus = sharedPreferences1.getBoolean("facebookLogin", false);
+        isGetLoginStatus = sharedPreferences1.getBoolean("facebookLogin", false);
         if (getLoginStatus || isGetLoginStatus){
             navigationView.getMenu().removeItem(R.id.changepassword);
             profile1.setVisibility(View.INVISIBLE);
@@ -159,41 +159,6 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
     }
 
 
-    /*private void change() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(
-                Profile.this);
-        builder.setTitle("Change Password");
-        builder.setMessage("Are You logged in Via Google?");
-               /* builder.setNeutralButton("Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,
-                                                int which) {
-                                Toast.makeText(getApplicationContext(), "Cancel is clicked", Toast.LENGTH_LONG).show();
-                            }
-                        });*/
-      /*  builder.setNegativeButton("Yes",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,
-                                        int which) {
-                        Toast.makeText(getApplicationContext(), "Cant change Password for google login", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(Profile.this, Profile.class);
-                        startActivity(intent);
-                    }
-
-                });
-        builder.setPositiveButton("No",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,
-                                        int which) {
-                        Intent intent = new Intent(Profile.this, password.class);
-                        startActivity(intent);
-                    }
-                });
-
-
-        builder.show();
-
-    }*/
 
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
@@ -290,9 +255,12 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
-        auth.signOut();
-        finish();
 
+        SharedPreferences.Editor editor2 = sharedPreferences1.edit();
+        editor2.clear();
+        editor2.apply();
+        finish();
+        auth.signOut();
         Intent intent = new Intent(Profile.this, login.class);
         Toast.makeText(Profile.this, "Logged Out Successfully.", Toast.LENGTH_LONG).show();
         startActivity(intent);

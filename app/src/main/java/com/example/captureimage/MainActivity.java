@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
        //     navigationView.getMenu().removeItem(R.id.changepassword);
         //}
         sharedPreferences1 = getSharedPreferences("facebookLogin", Context.MODE_PRIVATE);
-        getLoginStatus = sharedPreferences1.getBoolean("facebookLogin", false);
+       isGetLoginStatus = sharedPreferences1.getBoolean("facebookLogin", false);
         if (getLoginStatus || isGetLoginStatus) {
             navigationView.getMenu().removeItem(R.id.changepassword);
         }
@@ -380,7 +380,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
             startActivity(intent);
         }
-        if(!getLoginStatus || isGetLoginStatus) {
+        if(!getLoginStatus || !isGetLoginStatus) {
             if (id == R.id.changepassword) {
                 Intent intent = new Intent(MainActivity.this, password.class);
                 Toast.makeText(this, "Change Password", Toast.LENGTH_SHORT).show();
@@ -396,29 +396,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return false;
     }
 
-    public void ClickImage(View view) {
-        //recreate activity
-       recreate();
 
-    }
-    public void ChangePassword(View view){
-        //recreate activity
-
-
-    }
-    public void Profile(View view) {
-        //recreate activity
-        redirectActivity(this, Profile.class);
-    }
-    public static void redirectActivity(Activity activity, Class aClass) {
-        //initialized intent
-        Intent intent = new Intent(activity, aClass);
-        //set flag
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        //start activity
-        activity.startActivity(intent);
-
-    }
 
     public void Clicklogout(View view)
     {
@@ -429,55 +407,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
+
+        SharedPreferences.Editor editor2 = sharedPreferences1.edit();
+        editor2.clear();
+        editor2.apply();
+        finish();
 //session.setLoggedin(true);
 
         mAuth.signOut();
-        finish();
+       // finish();
 
         Intent intent = new Intent(MainActivity.this, login.class);
         Toast.makeText(MainActivity.this, "Logged Out Successfully.", Toast.LENGTH_LONG).show();
         startActivity(intent);
 
     }
-
-
-
-
-    /*private void change() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(
-                MainActivity.this);
-        builder.setTitle("Change Password");
-        builder.setMessage("Are You logged in Via Google?");
-               /* builder.setNeutralButton("Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,
-                                                int which) {
-                                Toast.makeText(getApplicationContext(), "Cancel is clicked", Toast.LENGTH_LONG).show();
-                            }
-                        });*/
-  /*      builder.setNegativeButton("Yes",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,
-                                        int which) {
-                        Toast.makeText(getApplicationContext(), "Cant change Password for google login", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(MainActivity.this, MainActivity.class);
-                        startActivity(intent);
-                    }
-
-                });
-        builder.setPositiveButton("No",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,
-                                        int which) {
-                        Intent intent = new Intent(MainActivity.this, password.class);
-                        startActivity(intent);
-                    }
-                });
-
-
-        builder.show();
-
-    }*/
 
 }
 
