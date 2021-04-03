@@ -88,6 +88,12 @@ public class display extends AppCompatActivity implements NavigationView.OnNavig
         profileimg = findViewById(R.id.profileimg);
         TextView display1 = findViewById(R.id.display);
         display1.setTextIsSelectable(true);
+
+        Intent intent = getIntent();
+        String s = intent.getStringExtra("");
+        display1.setText(" " + s);
+
+
         storageReference = FirebaseStorage.getInstance().getReference();
         auth = FirebaseAuth.getInstance();
         fStore = FirebaseFirestore.getInstance();
@@ -114,11 +120,6 @@ public class display extends AppCompatActivity implements NavigationView.OnNavig
         dpart = findViewById(R.id.dpart);
          number = findViewById(R.id.number);
         ActivityCompat.requestPermissions(display.this, new String[]{Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS}, PackageManager.PERMISSION_GRANTED);
-
-        Intent intent = getIntent();
-        String s = intent.getStringExtra("");
-        display1.setText(" " + s);
-
 
         Button send = (Button) findViewById(R.id.send);
         send.setOnClickListener(new View.OnClickListener() {
