@@ -182,6 +182,21 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
             Toast.makeText(this, "Translation", Toast.LENGTH_SHORT).show();
             startActivity(intent);
         }
+        if(id == R.id.logout){
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.clear();
+            editor.apply();
+
+            SharedPreferences.Editor editor2 = sharedPreferences1.edit();
+            editor2.clear();
+            editor2.apply();
+            finish();
+            auth.signOut();
+            Intent intent = new Intent(Profile.this, login.class);
+            Toast.makeText(Profile.this, "Logged Out Successfully.", Toast.LENGTH_LONG).show();
+            startActivity(intent);
+
+        }
 
 
         return false;
@@ -247,50 +262,6 @@ public class Profile extends AppCompatActivity implements NavigationView.OnNavig
         }
     }
 
-    public void Clicklogout(View view)
-    {
-        logout();
-    }
-    public  void logout(){
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
-        editor.apply();
-
-        SharedPreferences.Editor editor2 = sharedPreferences1.edit();
-        editor2.clear();
-        editor2.apply();
-        finish();
-        auth.signOut();
-        Intent intent = new Intent(Profile.this, login.class);
-        Toast.makeText(Profile.this, "Logged Out Successfully.", Toast.LENGTH_LONG).show();
-        startActivity(intent);
-
-    }
-    public void ClickImage(View view){
-        //recreate activity
-        redirectActivity(this,MainActivity.class);
-
-    }
-    public void Profile(View view){
-        //recreate activity
-        recreate();
-    }
-
-    public void ChangePassword(View view){
-        //recreate activity
-
-    }
-
-
-    public static void redirectActivity(Activity activity, Class aClass) {
-        //initialized intent
-        Intent intent = new Intent(activity,aClass);
-        //set flag
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        //start activity
-        activity.startActivity(intent);
-
-    }
 
 
 

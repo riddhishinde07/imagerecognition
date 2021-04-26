@@ -42,7 +42,7 @@ public class Register extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_register);
 
 // Assigning layout email ID and Password ID.
         name=(EditText)findViewById(R.id.edtname);
@@ -55,7 +55,6 @@ public class Register extends AppCompatActivity {
 // Creating object instance.
         firebaseAuth = FirebaseAuth.getInstance();
         firestore =FirebaseFirestore.getInstance();
-        progressDialog = new ProgressDialog(Register.this);
 
 // Adding click listener to Sign Up Button.
         SignUp.setOnClickListener(new View.OnClickListener() {
@@ -89,6 +88,8 @@ public class Register extends AppCompatActivity {
 
                                     Toast.makeText(Register.this, "Register Successfully", Toast.LENGTH_SHORT).show();
                                     startActivity(new Intent(getApplicationContext(), login.class));
+
+
                                 }
 
                                 else {
@@ -100,8 +101,8 @@ public class Register extends AppCompatActivity {
             }
         });
 
-        TextView already=findViewById(R.id.loginalready);
-        already.setOnClickListener(new View.OnClickListener() {
+       TextView login=findViewById(R.id.loginalready);
+        login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 

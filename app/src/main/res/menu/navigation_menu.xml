@@ -17,6 +17,10 @@
         android:textColor="#03A9F4"
         android:icon="@drawable/ic_trans"
         android:title="Translation"/>
+    <item android:id="@+id/logout"
+        android:textColor="#03A9F4"
+        android:icon="@drawable/ic_logout"
+        android:title="Logout"/>
 
 
 

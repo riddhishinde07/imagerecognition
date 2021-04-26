@@ -231,7 +231,22 @@ public class password extends AppCompatActivity implements NavigationView.OnNavi
             Toast.makeText(this, "Translation", Toast.LENGTH_SHORT).show();
             startActivity(intent);
         }
+        if(id == R.id.logout){
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.clear();
+            editor.apply();
 
+            SharedPreferences.Editor editor2 = sharedPreferences1.edit();
+            editor2.clear();
+            editor2.apply();
+
+            finish();
+            auth.signOut();
+
+            Intent intent = new Intent(password.this, login.class);
+            Toast.makeText(password.this, "Logged Out Successfully.", Toast.LENGTH_LONG).show();
+            startActivity(intent);
+        }
 
         return false;
     }
@@ -259,62 +274,6 @@ public class password extends AppCompatActivity implements NavigationView.OnNavi
             drawerLayout.closeDrawer(GravityCompat.START);
 
         }
-    }
-    public void ClickImage(View view) {
-        //recreate activity
-        redirectActivity(password.this,MainActivity.class);
-
-    }
-    public void ChangePassword(View view){
-        //recreate activity
-
-
-    }
-    public void Profile(View view) {
-        //recreate activity
-        redirectActivity(this, Profile.class);
-    }
-    public static void redirectActivity(Activity activity, Class aClass) {
-        //initialized intent
-        Intent intent = new Intent(activity, aClass);
-        //set flag
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        //start activity
-        activity.startActivity(intent);
-
-    }
-
-
-
-
-
-    public void Clicklogout(View view)
-    {
-        logout();
-    }
-    public void Logout() {
-        //recreate activity
-        logout();
-    }
-
-
-
-    public void logout() {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
-        editor.apply();
-
-        SharedPreferences.Editor editor2 = sharedPreferences1.edit();
-        editor2.clear();
-        editor2.apply();
-
-        finish();
-        auth.signOut();
-
-        Intent intent = new Intent(password.this, login.class);
-        Toast.makeText(password.this, "Logged Out Successfully.", Toast.LENGTH_LONG).show();
-        startActivity(intent);
-
     }
 
     @Override

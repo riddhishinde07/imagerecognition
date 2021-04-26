@@ -28,14 +28,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".translate"></activity>
-        <activity android:name=".password" />
-        <activity android:name=".Profile" />
-        <activity android:name=".reset" />
-        <activity android:name=".Register" />
-        <activity android:name=".display" />
-        <activity android:name=".MainActivity" />
-        <activity android:name=".login">
+        <activity android:name=".translate" android:theme="@style/AppTheme.NoActionBar" android:noHistory="true"/>
+        <activity android:name=".password" android:theme="@style/AppTheme.NoActionBar" android:noHistory="true"/>
+        <activity android:name=".Profile" android:theme="@style/AppTheme.NoActionBar" android:noHistory="true" />
+        <activity android:name=".reset" android:theme="@style/AppTheme.NoActionBar" android:noHistory="true"/>
+        <activity android:name=".Register" android:theme="@style/AppTheme.NoActionBar" android:noHistory="true"/>
+        <activity android:name=".display" android:theme="@style/AppTheme.NoActionBar" android:noHistory="true"/>
+        <activity android:name=".MainActivity" android:theme="@style/AppTheme.NoActionBar" android:noHistory="true"/>
+        <activity android:name=".login" android:theme="@style/AppTheme.NoActionBar"  android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

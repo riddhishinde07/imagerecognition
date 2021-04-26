@@ -31,6 +31,7 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -105,16 +106,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         storagePermission=new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
-       // ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+        // ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
         //ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
 
         sharedPreferences = getSharedPreferences("googleLogin", Context.MODE_PRIVATE);
         getLoginStatus = sharedPreferences.getBoolean("googleLogin", false);
-     //   if(getLoginStatus){
-       //     navigationView.getMenu().removeItem(R.id.changepassword);
+        //   if(getLoginStatus){
+        //     navigationView.getMenu().removeItem(R.id.changepassword);
         //}
         sharedPreferences1 = getSharedPreferences("facebookLogin", Context.MODE_PRIVATE);
-       isGetLoginStatus = sharedPreferences1.getBoolean("facebookLogin", false);
+        isGetLoginStatus = sharedPreferences1.getBoolean("facebookLogin", false);
         if (getLoginStatus || isGetLoginStatus) {
             navigationView.getMenu().removeItem(R.id.changepassword);
         }
@@ -130,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .build();
 
 
-            googleSignInClient = GoogleSignIn.getClient(this, gso);
+        googleSignInClient = GoogleSignIn.getClient(this, gso);
 
         //find imageview
 
@@ -150,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View v) {
                 SelectImg();
-              //  performCrop();
+                //  performCrop();
             }
         });
     }
@@ -251,31 +252,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 imageView.setImageURI(resultUri);
                 BitmapDrawable bitmapDrawable=(BitmapDrawable)imageView.getDrawable();
                 Bitmap bitmap=bitmapDrawable.getBitmap();
-                TextRecognizer recognizer = new TextRecognizer.Builder(getApplicationContext()).build();
+                FirebaseVisionImage firebaseVisionImage = FirebaseVisionImage.fromBitmap(bitmap);
+//2. Get an instance of FirebaseVision
+                FirebaseVision firebaseVision = FirebaseVision.getInstance();
+//3. Create an instance of FirebaseVisionTextRecognizer
+                FirebaseVisionTextRecognizer firebaseVisionTextRecognizer = firebaseVision.getOnDeviceTextRecognizer();
+//4. Create a task to process the image
+                Task<FirebaseVisionText> task = firebaseVisionTextRecognizer.processImage(firebaseVisionImage);
+//5. if task is success
+                task.addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
+                    @Override
+                    public void onSuccess(FirebaseVisionText firebaseVisionText) {
 
-                if(!recognizer.isOperational()){
-                    Toast.makeText(this,"Error",Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    Frame frame=new Frame.Builder().setBitmap(bitmap).build();
-                    SparseArray<TextBlock> items = recognizer.detect(frame);
-                    StringBuilder sb =new StringBuilder();
+                        String s = firebaseVisionText.getText();
+                        Intent intent = new Intent(MainActivity.this, display.class);
+                        intent.putExtra("", s);
+                        startActivity(intent);
 
-                    for(int i=0;i<items.size();i++){
-                        TextBlock myItems =items.valueAt(i);
-                        sb.append(myItems.getValue());
-                        sb.append("\n");
 
                     }
+                });
 
-                    textView.setText(sb.toString());
-                    String s = textView.getText().toString();
-                    Intent intent = new Intent(MainActivity.this, display.class);
-                    intent.putExtra("", s);
-                    startActivity(intent);
+//6. if task is failure
+                task.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
 
-
-                }
             }
             else if(resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE){
                 Exception error =result.getError();
@@ -317,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-  public void ClickLogo(View view) {
+    public void ClickLogo(View view) {
         //close drawer
         closeDrawer(drawerLayout);
     }
@@ -329,6 +334,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         }
     }
+
+@Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.image) {
@@ -351,6 +358,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.translate) {
             Intent intent = new Intent(MainActivity.this,translate.class);
             Toast.makeText(this, "Translation", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+        }
+        if(id == R.id.logout){
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.clear();
+            editor.apply();
+
+            SharedPreferences.Editor editor2 = sharedPreferences1.edit();
+            editor2.clear();
+            editor2.apply();
+            finish();
+            //session.setLoggedin(true);
+
+            mAuth.signOut();
+            // finish();
+
+            Intent intent = new Intent(MainActivity.this, login.class);
+            Toast.makeText(MainActivity.this, "Logged Out Successfully.", Toast.LENGTH_LONG).show();
             startActivity(intent);
         }
 
@@ -376,7 +401,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //session.setLoggedin(true);
 
         mAuth.signOut();
-       // finish();
+        // finish();
 
         Intent intent = new Intent(MainActivity.this, login.class);
         Toast.makeText(MainActivity.this, "Logged Out Successfully.", Toast.LENGTH_LONG).show();

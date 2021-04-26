@@ -278,6 +278,22 @@ public class display extends AppCompatActivity implements NavigationView.OnNavig
             Toast.makeText(this, "Translation", Toast.LENGTH_SHORT).show();
             startActivity(intent);
         }
+        if(id == R.id.logout){
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.clear();
+            editor.apply();
+
+            SharedPreferences.Editor editor2 = sharedPreferences1.edit();
+            editor2.clear();
+            editor2.apply();
+            finish();
+            auth.signOut();
+
+            Intent intent = new Intent(display.this, login.class);
+            Toast.makeText(display.this, "Logged Out Successfully.", Toast.LENGTH_LONG).show();
+            startActivity(intent);
+
+        }
 
 
         return false;
@@ -341,28 +357,6 @@ public class display extends AppCompatActivity implements NavigationView.OnNavig
 
 
 
-    public void Clicklogout(View view)
-    {
-        logout();
-    }
-
-    public void logout() {
-        //recreate activity
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
-        editor.apply();
-
-        SharedPreferences.Editor editor2 = sharedPreferences1.edit();
-        editor2.clear();
-        editor2.apply();
-        finish();
-        auth.signOut();
-
-        Intent intent = new Intent(display.this, login.class);
-        Toast.makeText(display.this, "Logged Out Successfully.", Toast.LENGTH_LONG).show();
-        startActivity(intent);
-
-    }
 
 
        @Override

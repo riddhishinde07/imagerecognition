@@ -283,28 +283,6 @@ public class translate extends AppCompatActivity  implements NavigationView.OnNa
 
         }
     }
-    public void Clicklogout(View view)
-    {
-        logout();
-    }
-
-    public void logout() {
-        //recreate activity
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
-        editor.apply();
-
-        SharedPreferences.Editor editor2 = sharedPreferences1.edit();
-        editor2.clear();
-        editor2.apply();
-        finish();
-        auth.signOut();
-
-        Intent intent = new Intent(translate.this, login.class);
-        Toast.makeText(translate.this, "Logged Out Successfully.", Toast.LENGTH_LONG).show();
-        startActivity(intent);
-
-    }
 
 
     @Override
@@ -337,6 +315,21 @@ public class translate extends AppCompatActivity  implements NavigationView.OnNa
         if (id == R.id.translate) {
             Intent intent = new Intent(translate.this,translate.class);
             Toast.makeText(this, "Translation", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+        }
+        if(id == R.id.logout){
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.clear();
+            editor.apply();
+
+            SharedPreferences.Editor editor2 = sharedPreferences1.edit();
+            editor2.clear();
+            editor2.apply();
+            finish();
+            auth.signOut();
+
+            Intent intent = new Intent(translate.this, login.class);
+            Toast.makeText(translate.this, "Logged Out Successfully.", Toast.LENGTH_LONG).show();
             startActivity(intent);
         }
         return false;
